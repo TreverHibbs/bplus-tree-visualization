@@ -6,9 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-ts": "./node_modules/.bin/tsc -w",
-    "watch-scss": "./node_modules/.bin/sass --watch css/main.scss css/main.css",
-    "start-server": "./node_modules/.bin/http-server",
-    "run": "concurrently \"npm:watch-ts\" \"npm:watch-scss\" \"npm:start-server\""
+    "watch-scss": "./node_modules/.bin/sass --watch dist/css/main.scss dist/css/main.css",
+    "start-server": "webpack serve --open",
+    "watch-webpack": "node_modules/.bin/webpack b -w",
+    "start": "concurrently \"npm:watch-scss\" \"npm:start-server\""
   },
   "repository": {
     "type": "git",
@@ -24,10 +25,16 @@
     "concurrently": "^6.2.0",
     "http-server": "^0.12.3",
     "sass": "^1.34.0",
-    "typescript": "^4.2.4"
+    "ts-loader": "^9.2.2",
+    "typescript": "^4.2.4",
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
     "@types/d3-hierarchy": "^2.0.0",
-    "d3-hierarchy": "^2.0.0"
+    "@types/d3-selection": "^2.0.0",
+    "d3-hierarchy": "^2.0.0",
+    "d3-selection": "^2.0.0",
+    "webpack": "^5.37.1"
   }
 }

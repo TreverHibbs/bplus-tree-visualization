@@ -11,5 +11,5 @@ services:
     ports:
       - 8080:8080
     user: node
-    command: npm run run
+    command: npm run start
     stdin_open: true
