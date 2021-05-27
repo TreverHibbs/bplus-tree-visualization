@@ -1,13 +1,15 @@
 version: '3.8'
 
-frontend:
-  build:
-    target: development
-  volumes:
-    - ./:/usr/src/app
-    - /usr/src/app/node_modules
-  ports:
-    - 3000:3000
-  user: node
-  command: npm start
-  stdin_open: true
+services:
+  app:
+    build:
+      context: ./
+      target: development
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 8080:8080
+    user: node
+    command: npm run run
+    stdin_open: true

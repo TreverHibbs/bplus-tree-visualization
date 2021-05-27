@@ -1,0 +1,33 @@
+{
+  "name": "bplus-tree-visualization",
+  "version": "1.0.0",
+  "description": "a visualization learning tool for b-plus-trees",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch-ts": "./node_modules/.bin/tsc -w",
+    "watch-scss": "./node_modules/.bin/sass --watch css/main.scss css/main.css",
+    "start-server": "./node_modules/.bin/http-server",
+    "run": "concurrently \"npm:watch-ts\" \"npm:watch-scss\" \"npm:start-server\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TreverHibbs/bplus-tree-visualization.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TreverHibbs/bplus-tree-visualization/issues"
+  },
+  "homepage": "https://github.com/TreverHibbs/bplus-tree-visualization#readme",
+  "devDependencies": {
+    "concurrently": "^6.2.0",
+    "http-server": "^0.12.3",
+    "sass": "^1.34.0",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@types/d3-hierarchy": "^2.0.0",
+    "d3-hierarchy": "^2.0.0"
+  }
+}
