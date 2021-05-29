@@ -9,7 +9,6 @@ COPY --chown=node:node package.json package-lock.json ./
 FROM base AS development
 USER root
 RUN apk add --no-cache git
-RUN apk add --no-cache parallel
 USER node
 RUN npm install
 

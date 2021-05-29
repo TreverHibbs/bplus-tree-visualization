@@ -5,4 +5,8 @@ const d3 = { select, selectAll, hierarchy }
 
 const mainSvg = d3.select("a");
 
+export const hello = () => {
+  return false;
+}
+
 console.log("hello");

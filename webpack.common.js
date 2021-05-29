@@ -9,13 +9,7 @@ if (process.env.TESTBUILD) {
 }
 
 module.exports = {
-  mode: 'development',
   entry: entry,
-  devServer: {
-    contentBase: './dist',
-    host: '0.0.0.0',
-    disableHostCheck: true,
-  },
   module: {
     rules: [
       {
