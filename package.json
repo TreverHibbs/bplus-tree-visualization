@@ -16,7 +16,6 @@
     "start-dev": "concurrently \"npm:watch-scss\" \"npm:start-server\" \"npm:watch-test-build\" \"npm:watch-mocha\"",
     "build": "webpack --config webpack.prod.js",
     "deploy": "gh-pages -d dist",
-    // for use by gh actions workflow
     "deploy-gh-actions": "gh-pages -d dist -u \"github-actions-bot <support+actions@github.com>\""
   },
   "repository": {
