@@ -1,11 +1,10 @@
 on: 
   push:
     branches:
-      - master
       - dev
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
