@@ -1,3 +1,4 @@
+import "./../css/main.scss";
 import { select, selectAll } from 'd3-selection';
 import { hierarchy } from 'd3-hierarchy';
 

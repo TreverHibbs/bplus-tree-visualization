@@ -1,4 +1,4 @@
-import { hello } from '../src/hello'; // this will be your custom import
+import { hello } from '../src/ts/hello'; // this will be your custom import
 import { expect } from 'chai';
 
 describe('hello world test', () => { // the tests container
