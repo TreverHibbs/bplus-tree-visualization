@@ -4,21 +4,30 @@ html {
 
 body {
   height: 100%;
-  color: blue;
+  margin: 0px;
 }
 
 .grid-container {
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+  grid-template-columns: 1.6fr;
+  grid-template-rows: 0.1fr 1.9fr;
   gap: 0px 0px;
   grid-template-areas:
-    ".";
+    "controls"
+    "main";
+}
+.controls { grid-area: controls; }
+.main { grid-area: main; }
+
+.div-controls {
+  height: 100%;
+  width: 100%;
 }
 
-.main-svg {
+.svg-main {
+  background: grey;
   height: 100%;
   width: 100%;
   place-self: center;
