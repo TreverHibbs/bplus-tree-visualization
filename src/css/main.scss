@@ -1,8 +1,11 @@
+@use 'colors';
+
 html {
   height: 100vh
 }
 
 body {
+  background: var(--bg);
   height: 100%;
   margin: 0px;
 }
@@ -22,12 +25,12 @@ body {
 .main { grid-area: main; }
 
 .div-controls {
+  background: var(--crimson);
   height: 100%;
   width: 100%;
 }
 
 .svg-main {
-  background: grey;
   height: 100%;
   width: 100%;
   place-self: center;
