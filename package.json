@@ -30,6 +30,7 @@
   "homepage": "https://github.com/TreverHibbs/bplus-tree-visualization#readme",
   "devDependencies": {
     "@types/chai": "^4.2.18",
+    "@types/d3-shape": "^2.1.0",
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.4",
     "concurrently": "^6.2.0",
@@ -53,6 +54,7 @@
     "@types/d3-selection": "^2.0.0",
     "d3-hierarchy": "^2.0.0",
     "d3-selection": "^2.0.0",
+    "d3-shape": "^2.1.0",
     "webpack": "^5.37.1"
   }
 }
