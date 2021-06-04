@@ -1,9 +1,10 @@
-import { hello } from '../src/ts/hello'; // this will be your custom import
+import { BPlusTreeFactory } from '../src/ts/bPlusTreeAlgo';
 import { expect } from 'chai';
 
-describe('hello world test', () => { // the tests container
-    it('checking return', (): void => { // the single test
-                /* detect retina */
-        expect(hello()).to.be.false; // Do I need to explain anything? It's like writing in English!
-    });
+describe('BPlusTreeFactory', () => { // the tests container
+  it(`should return BPlusTree object with null root 
+      and maxChildren set`, (): void => {
+    /* detect retina */
+    expect(BPlusTreeFactory(2)).to.include({ root: null, maxChildren: 2 });
+  });
 });
