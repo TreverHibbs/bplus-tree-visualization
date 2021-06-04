@@ -14,8 +14,22 @@ export interface BPlusTreeNode {
 export interface BPlusTree {
   root: BPlusTreeNode | null;
   maxChildren: number;
+  insert: (a: number) => void;
 }
 
 export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
-  return({ root: null, maxChildren: maxChildrenValue });
+
+  const maxChildren = maxChildrenValue;
+  const root = null;
+
+  const insert = (value: number): void => {
+    console.debug("number to insert", value);
+    return;
+  }
+
+  return ({
+    root,
+    maxChildren,
+    insert
+  });
 }
