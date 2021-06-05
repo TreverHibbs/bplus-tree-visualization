@@ -1,11 +1,12 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+let glob = require("glob");
 const path = require('path');
 
 let entry = './src/ts/index.ts';
 let outputPath = 'dist';
 
 if (process.env.TESTBUILD) {
-  entry = './tests/test.ts';
+  entry = glob.sync('./tests/**/*.test.ts');
   outputPath = 'test-dist';
 }
 
@@ -38,6 +39,7 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, outputPath),
+    clean: true,
   },
   plugins: [
     new HtmlWebpackPlugin({

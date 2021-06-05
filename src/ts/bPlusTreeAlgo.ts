@@ -11,6 +11,19 @@ export interface BPlusTreeNode {
   pointers: BPlusTreeNode[];
 }
 
+export const BPlusTreeNodeFactory = (leafValue: boolean): BPlusTreeNode => {
+  const leafNode = leafValue;
+  const keys: number[] = [];
+  const pointers: BPlusTreeNode[] = [];
+
+  return ({
+    leafNode,
+    keys,
+    pointers
+  });
+}
+
+
 export interface BPlusTree {
   root: BPlusTreeNode | null;
   maxChildren: number;
@@ -20,9 +33,12 @@ export interface BPlusTree {
 export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
 
   const maxChildren = maxChildrenValue;
-  const root = null;
+  let root: BPlusTreeNode | null = null;
 
   const insert = (value: number): void => {
+    if (root == null) {
+      root = BPlusTreeNodeFactory(true);
+    }
     console.debug("number to insert", value);
     return;
   }

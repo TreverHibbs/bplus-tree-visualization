@@ -6,7 +6,7 @@
   "scripts": {
     "test": "TESTBUILD=true ./node_modules/.bin/webpack b && ./node_modules/.bin/mocha test-dist/bundle.js",
     "watch-test": "concurrently \"TESTBUILD=true ./node_modules/.bin/webpack b -w\" \"./node_modules/.bin/mocha -w test-dist/bundle.js\"",
-    "watch-test-build": "TESTBUILD=true ./node_modules/.bin/webpack b -w",
+    "watch-test-build": "TESTBUILD=true ./node_modules/.bin/webpack b -w --config webpack.dev.js",
     "watch-mocha": "./node_modules/.bin/mocha -w test-dist/bundle.js",
     "watch-ts": "./node_modules/.bin/tsc -w",
     "watch-scss": "./node_modules/.bin/sass --watch dist/css/main.scss dist/css/main.css",
