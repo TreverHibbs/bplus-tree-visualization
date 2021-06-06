@@ -3,15 +3,11 @@ let glob = require("glob");
 const path = require('path');
 
 let entry = './src/ts/index.ts';
-let htmlTemplate = 'src/index.html';
 let outputPath = 'dist';
-let htmlInject = true;
 
 if (process.env.TESTBUILD) {
   entry = glob.sync('./tests/**/*.test.ts');
   outputPath = 'test-dist';
-  htmlTemplate = 'tests/test.ejs';
-  htmlInject = false;
 }
 
 module.exports = {
@@ -47,9 +43,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: htmlTemplate,
-      inject: htmlInject,
-      title: 'awesome'
+      template: 'src/index.html'
     })
   ],
 };

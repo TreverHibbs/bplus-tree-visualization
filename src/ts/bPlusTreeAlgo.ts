@@ -36,16 +36,19 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
   let root: BPlusTreeNode | null = null;
 
   const insert = (value: number): void => {
-    if (root == null) {
+    if (root === null) {
       root = BPlusTreeNodeFactory(true);
+      root.keys.push(value);
+      console.debug('running insert if', root);
     }
-    console.debug("number to insert", value);
     return;
   }
 
-  return ({
+  const newBPlusTree = {
     root,
     maxChildren,
     insert
-  });
+  };
+
+  return (newBPlusTree);
 }
