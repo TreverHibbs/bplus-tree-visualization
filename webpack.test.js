@@ -43,7 +43,13 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'src/index.html'
+      template: 'tests/index.html'
     })
   ],
+  mode: 'development',
+  devServer: {
+    contentBase: './test-dist/',
+    host: '0.0.0.0',
+    disableHostCheck: true,
+  },
 };

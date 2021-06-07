@@ -23,9 +23,9 @@ export const BPlusTreeNodeFactory = (leafValue: boolean): BPlusTreeNode => {
   });
 }
 
-
+export type BPlusTreeRoot = BPlusTreeNode | null;
 export interface BPlusTree {
-  root: BPlusTreeNode | null;
+  getRoot: () => BPlusTreeRoot;
   maxChildren: number;
   insert: (a: number) => void;
 }
@@ -33,7 +33,7 @@ export interface BPlusTree {
 export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
 
   const maxChildren = maxChildrenValue;
-  let root: BPlusTreeNode | null = null;
+  let root: BPlusTreeRoot = null;
 
   const insert = (value: number): void => {
     if (root === null) {
@@ -44,8 +44,12 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
     return;
   }
 
+  const getRoot = (): BPlusTreeRoot => {
+    return root;
+  }
+
   const newBPlusTree = {
-    root,
+    getRoot,
     maxChildren,
     insert
   };
