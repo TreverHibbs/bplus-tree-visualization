@@ -1,4 +1,4 @@
-import { BPlusTreeFactory } from '../src/ts/bPlusTreeAlgo';
+import { BPlusTreeFactory, BPlusTreeRoot } from '../src/ts/bPlusTreeAlgo';
 import { expect } from 'chai';
 
 describe('BPlusTree', (): void => {
@@ -7,7 +7,39 @@ describe('BPlusTree', (): void => {
     it('should return BPlusTree object with null root and maxChildren set',
       (): void => {
         /* detect retina */
-        expect(myBplusTree).to.include({ root: null, maxChildren: 2 });
+        expect(myBplusTree).to.include({ maxChildren: 2 });
+      });
+  });
+
+  describe('BPlusTree find func', (): void => {
+    const myFindBPlusTree = BPlusTreeFactory(2);
+    const myFindBPlusTreeRoot = {
+      isLeafNode: false,
+      keys: [3, 4],
+      pointers: [
+        { isLeafNode: true, keys: [2], pointers: [] },
+        { isLeafNode: true, keys: [3], pointers: [] },
+        { isLeafNode: true, keys: [4, 6], pointers: [] }
+      ]
+    };
+    myFindBPlusTree.setRoot(myFindBPlusTreeRoot);
+    it('should successfully find the numbers 6, 2, 3, and 4 in the tree',
+      (): void => {
+        /* detect retina */
+        expect(myFindBPlusTree.find(6)).to.eql({ isLeafNode: true, keys: [4, 6], pointers: [] });
+        expect(myFindBPlusTree.find(2)).to.eql({ isLeafNode: true, keys: [2], pointers: [] });
+        expect(myFindBPlusTree.find(3)).to.eql({ isLeafNode: true, keys: [3], pointers: [] });
+        expect(myFindBPlusTree.find(4)).to.eql({ isLeafNode: true, keys: [4, 6], pointers: [] });
+      });
+    it('should insert the correct steps into the algo step queue',
+      (): void => {
+        /* detect retina */
+        expect(myFindBPlusTree.getAlgoStepQueue().splice(0, 2)).to.eql([{ type: 'find-right' }, { type: 'find-found', foundElementIndex: 1 }]);
+      });
+    it('should fail to find number 10',
+      (): void => {
+        /* detect retina */
+        expect(myFindBPlusTree.find(10)).to.eql(null);
       });
   });
 
@@ -15,11 +47,10 @@ describe('BPlusTree', (): void => {
     myBplusTree.insert(2);
     it('should initialize the root when first number is inserted',
       (): void => {
-        console.log(myBplusTree.root, 'root in tes');
-        expect(myBplusTree.root).to.not.be.a('null');
-        expect(myBplusTree.root).to.have.property('keys').eql([2]);
-        expect(myBplusTree.root).to.have.property('pointers').eql([]);
-        expect(myBplusTree.root).to.have.property('leafNode').eql(true);
+        expect(myBplusTree.getRoot()).to.not.be.a('null');
+        expect(myBplusTree.getRoot()).to.have.property('keys').eql([2]);
+        expect(myBplusTree.getRoot()).to.have.property('pointers').eql([]);
+        expect(myBplusTree.getRoot()).to.have.property('isLeafNode').eql(true);
       });
 
     let numbersToInsert = [3, 4, 6];
@@ -28,13 +59,13 @@ describe('BPlusTree', (): void => {
     }
     it('should insert series of numbers',
       (): void => {
-        expect(myBplusTree.root).to.eql({
-          leafNode: false,
+        expect(myBplusTree.getRoot()).to.eql({
+          isLeafNode: false,
           keys: [3, 4],
           pointers: [
-            { leafNode: true, keys: [2], pointers: [] },
-            { leafNode: true, keys: [3], pointers: [] },
-            { leafNode: true, keys: [4, 6], pointers: [] }
+            { isLeafNode: true, keys: [2], pointers: [] },
+            { isLeafNode: true, keys: [3], pointers: [] },
+            { isLeafNode: true, keys: [4, 6], pointers: [] }
           ]
         });
       });
@@ -44,53 +75,53 @@ describe('BPlusTree', (): void => {
 
     it('should insert bigger series of numbers',
       (): void => {
-        expect(myBplusTree.root).to.eql({
-          leafNode: false,
+        expect(myBplusTree.getRoot()).to.eql({
+          isLeafNode: false,
           keys: [4, 10],
           pointers: [
             {
-              leafNode: false,
+              isLeafNode: false,
               keys: [3],
               pointers: [
                 {
-                  leafNode: true,
+                  isLeafNode: true,
                   keys: [2],
                   pointers: []
                 },
                 {
-                  leafNode: true,
+                  isLeafNode: true,
                   keys: [3],
                   pointers: []
                 }
               ]
             },
             {
-              leafNode: false,
+              isLeafNode: false,
               keys: [6],
               pointers: [
                 {
-                  leafNode: true,
+                  isLeafNode: true,
                   keys: [4],
                   pointers: []
                 },
                 {
-                  leafNode: true,
+                  isLeafNode: true,
                   keys: [6],
                   pointers: []
                 }
               ]
             },
             {
-              leafNode: false,
+              isLeafNode: false,
               keys: [11],
               pointers: [
                 {
-                  leafNode: true,
+                  isLeafNode: true,
                   keys: [10],
                   pointers: []
                 },
                 {
-                  leafNode: true,
+                  isLeafNode: true,
                   keys: [11, 15],
                   pointers: []
                 }
@@ -107,12 +138,12 @@ describe('BPlusTree', (): void => {
         for (let num of numbersToInsert) {
           myN3Tree.insert(num);
         }
-        expect(myN3Tree.root).to.eql({
-          leafNode: false,
+        expect(myN3Tree.getRoot()).to.eql({
+          isLeafNode: false,
           keys: [5],
           pointers: [
-            { leafNode: true, keys: [2, 4], pointers: [] },
-            { leafNode: true, keys: [5, 10], pointers: [] },
+            { isLeafNode: true, keys: [2, 4], pointers: [] },
+            { isLeafNode: true, keys: [5, 10], pointers: [] },
           ]
         });
       });
