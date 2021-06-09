@@ -25,11 +25,16 @@ export const BPlusTreeNodeFactory = (leafValue: boolean): BPlusTreeNode => {
 
 export type BPlusTreeRoot = BPlusTreeNode | null;
 
+export enum algoStepTypeEnum {
+  SelectChild = "SELECTCHILD",
+  Found = "FOUND"
+}
 interface algoStep {
-  readonly type: string;
+  readonly type: algoStepTypeEnum;
 }
 export interface algoFindStep extends algoStep {
   readonly foundElementIndex?: number;
+  readonly selectedChildIndex?: number;
 }
 export interface algoInsertStep extends algoStep {
 }

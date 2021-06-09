@@ -1,4 +1,4 @@
-import { BPlusTreeFactory, BPlusTreeRoot } from '../src/ts/bPlusTreeAlgo';
+import { BPlusTreeFactory, BPlusTreeRoot, algoStepTypeEnum } from '../src/ts/bPlusTreeAlgo';
 import { expect } from 'chai';
 
 describe('BPlusTree', (): void => {
@@ -34,7 +34,18 @@ describe('BPlusTree', (): void => {
     it('should insert the correct steps into the algo step queue',
       (): void => {
         /* detect retina */
-        expect(myFindBPlusTree.getAlgoStepQueue().splice(0, 2)).to.eql([{ type: 'find-right' }, { type: 'find-found', foundElementIndex: 1 }]);
+        expect(myFindBPlusTree.getAlgoStepQueue()).to.eql(
+          [
+            { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
+            { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
+            { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
+            { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+            { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+            { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+            { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
+            { type: algoStepTypeEnum.Found, foundElementIndex: 0 }
+          ]
+        );
       });
     it('should fail to find number 10',
       (): void => {
