@@ -6,7 +6,6 @@ describe('BPlusTree', (): void => {
   describe('BPlusTreeFactory', () => { // the tests container
     it('should return BPlusTree object with null root and maxChildren set',
       (): void => {
-        /* detect retina */
         expect(myBplusTree).to.include({ maxChildren: 2 });
       });
   });
@@ -23,17 +22,25 @@ describe('BPlusTree', (): void => {
       ]
     };
     myFindBPlusTree.setRoot(myFindBPlusTreeRoot);
+    const Find6Obj = myFindBPlusTree.find(6);
+    const Find2Obj = myFindBPlusTree.find(2);
+    const Find3Obj = myFindBPlusTree.find(3);
+    const Find4Obj = myFindBPlusTree.find(4);
+    const Find10Obj = myFindBPlusTree.find(10);
+
     it('should successfully find the numbers 6, 2, 3, and 4 in the tree',
       (): void => {
-        /* detect retina */
-        expect(myFindBPlusTree.find(6)).to.eql({ isLeafNode: true, keys: [4, 6], pointers: [] });
-        expect(myFindBPlusTree.find(2)).to.eql({ isLeafNode: true, keys: [2], pointers: [] });
-        expect(myFindBPlusTree.find(3)).to.eql({ isLeafNode: true, keys: [3], pointers: [] });
-        expect(myFindBPlusTree.find(4)).to.eql({ isLeafNode: true, keys: [4, 6], pointers: [] });
+        expect(Find6Obj).to.eql({ node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: true });
+        expect(Find2Obj).to.eql({ node: { isLeafNode: true, keys: [2], pointers: [] }, foundFlag: true });
+        expect(Find3Obj).to.eql({ node: { isLeafNode: true, keys: [3], pointers: [] }, foundFlag: true });
+        expect(Find4Obj).to.eql({ node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: true });
+      });
+    it('should fail to find number 10',
+      (): void => {
+        expect(Find10Obj).to.eql({ node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false });
       });
     it('should insert the correct steps into the algo step queue',
       (): void => {
-        /* detect retina */
         expect(myFindBPlusTree.getAlgoStepQueue()).to.eql(
           [
             { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
@@ -43,14 +50,11 @@ describe('BPlusTree', (): void => {
             { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
             { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
             { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
-            { type: algoStepTypeEnum.Found, foundElementIndex: 0 }
+            { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+            { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
+            { type: algoStepTypeEnum.NotFound }
           ]
         );
-      });
-    it('should fail to find number 10',
-      (): void => {
-        /* detect retina */
-        expect(myFindBPlusTree.find(10)).to.eql(null);
       });
   });
 

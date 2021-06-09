@@ -27,7 +27,8 @@ export type BPlusTreeRoot = BPlusTreeNode | null;
 
 export enum algoStepTypeEnum {
   SelectChild = "SELECTCHILD",
-  Found = "FOUND"
+  Found = "FOUND",
+  NotFound = "NOTFOUND"
 }
 interface algoStep {
   readonly type: algoStepTypeEnum;
@@ -40,7 +41,7 @@ export interface algoInsertStep extends algoStep {
 }
 export interface algoDeleteStep extends algoStep {
 }
-type algoQueueElement = (algoFindStep|algoInsertStep|algoDeleteStep);
+type algoQueueElement = (algoFindStep | algoInsertStep | algoDeleteStep);
 
 export interface BPlusTree {
   getAlgoStepQueue: () => algoQueueElement[];
@@ -50,6 +51,8 @@ export interface BPlusTree {
   insert: (a: number) => void;
   find: (v: number) => BPlusTreeNode | null;
 }
+
+type findReturnType = { node: BPlusTreeNode | null, foundFlag: boolean };
 
 
 export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
@@ -72,50 +75,90 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
     return;
   }
 
+  /**
+   * inserts a number into the B+tree
+   * @param {number} value - The number to insert
+   */
   const insert = (value: number): void => {
+    let targetLeafnode: BPlusTreeNode;
     if (root === null) {
       // (tree is empty) create an empty leaf node, which is also the root.
-      root = BPlusTreeNodeFactory(true);
-      root.keys.push(value);
-      root.isLeafNode = true;
+      targetLeafnode = BPlusTreeNodeFactory(true);
     } else {
       // find the leaf node L that should contain key value K.
+      const findReturnObj = find(value);
+      if (findReturnObj.foundFlag) {
+        // The value already exists in the tree don't insert duplicate 
+        return;
+      }
+      if (findReturnObj.node) {
+        targetLeafnode = findReturnObj.node;
+      }
     }
     return;
   }
 
   /**
-   * finds a number in a BPlusTree
+   * finds a number in a BPlusTree and updates the animation step queue
    * @param {number} value - The number to find
    * @return {BPlusTreeNode | null} currentNode - The node containing
    * the found number or null if not found
    */
-  const find = (value: number): BPlusTreeNode | null => {
+  const find = (value: number): findReturnType => {
     if (root == null) {
-      return null;
+      return { node: null, foundFlag: false };
     }
 
     let currentNode = root;
     while (!currentNode.isLeafNode) {
-      let keyIndex = root.keys.findIndex(key => (value <= key));
+      let keyIndex = currentNode.keys.findIndex(key => (value <= key));
       if (keyIndex == -1) {
         // get last non null pointer in the node
-        let lastPointer = root.pointers.slice(-1)[0];
+        let lastPointer = currentNode.pointers.slice(-1)[0];
+
+        // insert corresponding step into algoStepQueue
+        algoStepQueue.push(
+          {
+            type: algoStepTypeEnum.SelectChild,
+            selectedChildIndex: (currentNode.pointers.length - 1)
+          })
+
         currentNode = lastPointer;
       }
-      else if (value == root.keys[keyIndex]) {
-        currentNode = currentNode.pointers[keyIndex + 1];
+      else if (value == currentNode.keys[keyIndex]) {
+        const nextNodePointerIndex = keyIndex + 1;
+        currentNode = currentNode.pointers[nextNodePointerIndex];
+        algoStepQueue.push(
+          {
+            type: algoStepTypeEnum.SelectChild,
+            selectedChildIndex: (nextNodePointerIndex)
+          })
       }
       else {
         currentNode = currentNode.pointers[keyIndex];
+        algoStepQueue.push(
+          {
+            type: algoStepTypeEnum.SelectChild,
+            selectedChildIndex: keyIndex
+          })
       }
     }
     // C is leaf Node
     const keyIndex = currentNode.keys.findIndex(key => (value == key));
     if (keyIndex != -1) {
+      algoStepQueue.push(
+        {
+          type: algoStepTypeEnum.Found,
+          foundElementIndex: keyIndex
+        })
       return currentNode; // return pointer to actual data record
     } else {
-      return null; // no record with key value *value* exists
+      algoStepQueue.push(
+        {
+          type: algoStepTypeEnum.NotFound
+        })
+      return currentNode; // no record with key value *value* exists
+      // return the current node anyways because it is needed for
     }
   }
 
