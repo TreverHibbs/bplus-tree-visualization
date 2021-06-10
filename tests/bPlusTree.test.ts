@@ -131,34 +131,32 @@ describe('BPlusTree', (): void => {
         });
     });
 
-    //TODO finish writing this test
-    xdescribe('test on big b+tree', (): void => {
+    describe('test on big b+tree', (): void => {
       const {returnValues: actualValues, queue: algoStepQueue } = runFindTest(bigBPlusTree, 2, [6, 10, 5]);
       const expectedReturnValues = [
         { node: { isLeafNode: true, keys: [6], pointers: [] }, foundFlag: true },
         { node: { isLeafNode: true, keys: [10], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false },
+        { node: { isLeafNode: true, keys: [4], pointers: [] }, foundFlag: false },
       ];
       const returnAndExpectedValues = zip([actualValues, expectedReturnValues]);
       it('should successfully find the 6,  and 10, and fail to find 5',
         (): void => {
-          for (let pair of returnAndExpectedValues) {
-            expect(pair[0]).to.eql(pair[1]);
+          for (let value of returnAndExpectedValues) {
+            expect(value[0]).to.eql(value[1]);
           }
         });
       it('should insert the correct steps into the algo step queue',
         (): void => {
           expect(algoStepQueue).to.eql(
             [
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
               { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
               { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
               { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
+              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
               { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
+              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
               { type: algoStepTypeEnum.NotFound }
             ]
           );
