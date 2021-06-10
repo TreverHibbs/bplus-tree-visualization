@@ -41,7 +41,7 @@ export interface algoInsertStep extends algoStep {
 }
 export interface algoDeleteStep extends algoStep {
 }
-type algoQueueElement = (algoFindStep | algoInsertStep | algoDeleteStep);
+export type algoQueueElement = (algoFindStep | algoInsertStep | algoDeleteStep);
 
 export interface BPlusTree {
   getAlgoStepQueue: () => algoQueueElement[];

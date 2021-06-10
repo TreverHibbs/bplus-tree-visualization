@@ -4,7 +4,6 @@ import {
   algoStepTypeEnum,
   algoQueueElement,
   findReturnType,
-  BPlusTreeNode,
 } from '../src/ts/bPlusTreeAlgo';
 import { expect } from 'chai';
 import { zip } from '../src/ts/util';
@@ -104,22 +103,18 @@ describe('BPlusTree', (): void => {
         { node: { isLeafNode: true, keys: [2], pointers: [] }, foundFlag: true },
         { node: { isLeafNode: true, keys: [3], pointers: [] }, foundFlag: true },
         { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: true },
+        { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false },
       ];
       const returnAndExpectedValues = zip([actualReturnValues, expectedReturnValues]);
-      it('should successfully find the numbers 6, 2, 3, and 4 in the small tree and insert correct algo steps',
+      it('should successfully find the numbers 6, 2, 3, and 4 and fail to find 10',
         (): void => {
           for (let pair of returnAndExpectedValues) {
             expect(pair[0]).to.eql(pair[1]);
           }
         });
-      it('should fail to find number 10 in small tree',
-        (): void => {
-          const actualReturnValues = runFindTest(smallBPlusTree, 2, [10]);
-          expect(actualReturnValues[0]).to.eql({ node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false });
-        });
       it('should insert the correct steps into the algo step queue',
         (): void => {
-          expect(myFindBPlusTree.getAlgoStepQueue()).to.eql(
+          expect(algoStepQueue).to.eql(
             [
               { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
               { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
@@ -135,32 +130,25 @@ describe('BPlusTree', (): void => {
           );
         });
     });
-    describe('test on big b+tree', (): void => {
-      const myFindBPlusTree = BPlusTreeFactory(2);
-      myFindBPlusTree.setRoot(bigBPlusTree);
 
-      const actualReturnValues = [
-        myFindBPlusTree.find(6),
-        myFindBPlusTree.find(10),
-      ];
+    //TODO finish writing this test
+    xdescribe('test on big b+tree', (): void => {
+      const {returnValues: actualValues, queue: algoStepQueue } = runFindTest(bigBPlusTree, 2, [6, 10, 5]);
       const expectedReturnValues = [
         { node: { isLeafNode: true, keys: [6], pointers: [] }, foundFlag: true },
         { node: { isLeafNode: true, keys: [10], pointers: [] }, foundFlag: true },
+        { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false },
       ];
-      const returnAndExpectedValues = zip([]);
-      it('should successfully find the numbers 6, and 10',
+      const returnAndExpectedValues = zip([actualValues, expectedReturnValues]);
+      it('should successfully find the 6,  and 10, and fail to find 5',
         (): void => {
           for (let pair of returnAndExpectedValues) {
             expect(pair[0]).to.eql(pair[1]);
           }
         });
-      it('should fail to find 5',
-        (): void => {
-          expect(myFindBPlusTree.find(10)).to.eql({ node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false });
-        });
       it('should insert the correct steps into the algo step queue',
         (): void => {
-          expect(myFindBPlusTree.getAlgoStepQueue()).to.eql(
+          expect(algoStepQueue).to.eql(
             [
               { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 2 },
               { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
