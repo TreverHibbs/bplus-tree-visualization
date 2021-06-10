@@ -201,12 +201,12 @@ describe('BPlusTree', (): void => {
         expect(returnValue).to.have.property('pointers').eql([]);
         expect(returnValue).to.have.property('isLeafNode').eql(true);
         expect(queue).to.eql([
-            { type: algoStepTypeEnum.InitRoot },
-            { type: algoStepTypeEnum.InsertInLeaf },
+          { type: algoStepTypeEnum.InitRoot },
+          { type: algoStepTypeEnum.InsertInLeaf },
         ]);
       });
 
-    describe('BPlusTree insert func', (): void => {
+    describe('insert small b+tree', (): void => {
       let numbersToInsert = [2, 3, 4, 6];
       const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
       it('should insert 2, 3, 4, and 6 and qual the samll b+tree',
@@ -218,29 +218,39 @@ describe('BPlusTree', (): void => {
           expect(insertTestReturn.queue).to.eql([
             { type: algoStepTypeEnum.InitRoot },
             { type: algoStepTypeEnum.InsertInLeaf },
+            { type: algoStepTypeEnum.NotFound },
+            { type: algoStepTypeEnum.InsertInLeaf },
+            { type: algoStepTypeEnum.NotFound },
+            { type: algoStepTypeEnum.SplitNode },
+            { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+            { type: algoStepTypeEnum.NotFound },
+            { type: algoStepTypeEnum.SplitNode },
           ]);
         });
     });
-    it('should insert big b+tree numbers',
-      (): void => {
-        expect(myBplusTree.getRoot()).to.eql(bigBPlusTree);
-      });
 
-    it('should insert series of numbers with n = 3',
-      (): void => {
-        const myN3Tree = BPlusTreeFactory(3);
-        let numbersToInsert = [2, 5, 10, 4];
-        for (let num of numbersToInsert) {
-          myN3Tree.insert(num);
-        }
-        expect(myN3Tree.getRoot()).to.eql({
-          isLeafNode: false,
-          keys: [5],
-          pointers: [
-            { isLeafNode: true, keys: [2, 4], pointers: [] },
-            { isLeafNode: true, keys: [5, 10], pointers: [] },
-          ]
+    describe('insert big b+tree', (): void => {
+      it('should insert big b+tree numbers',
+        (): void => {
+          expect(myBplusTree.getRoot()).to.eql(bigBPlusTree);
         });
-      });
+
+      it('should insert series of numbers with n = 3',
+        (): void => {
+          const myN3Tree = BPlusTreeFactory(3);
+          let numbersToInsert = [2, 5, 10, 4];
+          for (let num of numbersToInsert) {
+            myN3Tree.insert(num);
+          }
+          expect(myN3Tree.getRoot()).to.eql({
+            isLeafNode: false,
+            keys: [5],
+            pointers: [
+              { isLeafNode: true, keys: [2, 4], pointers: [] },
+              { isLeafNode: true, keys: [5, 10], pointers: [] },
+            ]
+          });
+        });
+    });
   });
 });
