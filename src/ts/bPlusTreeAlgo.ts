@@ -49,10 +49,10 @@ export interface BPlusTree {
   setRoot: (newRoot: BPlusTreeRoot) => void;
   maxChildren: number;
   insert: (a: number) => void;
-  find: (v: number) => BPlusTreeNode | null;
+  find: (v: number) => findReturnType;
 }
 
-type findReturnType = { node: BPlusTreeNode | null, foundFlag: boolean };
+export type findReturnType = { node: BPlusTreeNode | null, foundFlag: boolean };
 
 
 export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
@@ -151,13 +151,13 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
           type: algoStepTypeEnum.Found,
           foundElementIndex: keyIndex
         })
-      return currentNode; // return pointer to actual data record
+      return { node: currentNode, foundFlag: true }; // return pointer to actual data record
     } else {
       algoStepQueue.push(
         {
           type: algoStepTypeEnum.NotFound
         })
-      return currentNode; // no record with key value *value* exists
+      return { node: currentNode, foundFlag: false }; // no record with key value *value* exists
       // return the current node anyways because it is needed for
     }
   }
