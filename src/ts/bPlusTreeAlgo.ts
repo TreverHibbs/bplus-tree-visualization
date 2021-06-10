@@ -28,7 +28,9 @@ export type BPlusTreeRoot = BPlusTreeNode | null;
 export enum algoStepTypeEnum {
   SelectChild = "SELECTCHILD",
   Found = "FOUND",
-  NotFound = "NOTFOUND"
+  NotFound = "NOTFOUND",
+  InitRoot = "INITROOT",
+  InsertInLeaf = "INSERTINLEAF",
 }
 interface algoStep {
   readonly type: algoStepTypeEnum;

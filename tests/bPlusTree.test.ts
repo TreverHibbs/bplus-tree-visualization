@@ -4,6 +4,7 @@ import {
   algoStepTypeEnum,
   algoQueueElement,
   findReturnType,
+  BPlusTreeNode,
 } from '../src/ts/bPlusTreeAlgo';
 import { expect } from 'chai';
 import { zip } from '../src/ts/util';
@@ -73,9 +74,25 @@ describe('BPlusTree', (): void => {
       { isLeafNode: true, keys: [4, 6], pointers: [] }
     ]
   };
-  const runFindTest = (treeRoot: BPlusTreeRoot,
-    treeDegree: number,
-    testNumbers: number[],): { returnValues: findReturnType[], queue: algoQueueElement[] } => {
+  interface testOptions {
+    treeDegree: number;
+    testNumbers: number[];
+  }
+  interface findTestOptions extends testOptions {
+    treeRoot: BPlusTreeRoot;
+  }
+  interface testReturn {
+    queue: algoQueueElement[];
+  }
+  interface findTestReturn extends testReturn {
+    returnValues: findReturnType[]
+  }
+  interface insertTestReturn extends testReturn {
+    returnValue: BPlusTreeRoot
+  }
+
+  const runFindTest = (parameters: findTestOptions): findTestReturn => {
+    const { treeRoot, treeDegree, testNumbers, } = parameters;
     const myFindBPlusTree = BPlusTreeFactory(treeDegree);
     myFindBPlusTree.setRoot(treeRoot);
 
@@ -84,6 +101,15 @@ describe('BPlusTree', (): void => {
       returnValues.push(myFindBPlusTree.find(value));
     }
     return { returnValues, queue: myFindBPlusTree.getAlgoStepQueue() };
+  }
+  const runInsertTest = (parameters: testOptions): insertTestReturn => {
+    const { treeDegree, testNumbers } = parameters;
+    const myBPlusTree = BPlusTreeFactory(treeDegree);
+
+    for (let value of testNumbers) {
+      myBPlusTree.insert(value);
+    }
+    return { returnValue: myBPlusTree.getRoot(), queue: myBPlusTree.getAlgoStepQueue() };
   }
 
 
@@ -97,7 +123,8 @@ describe('BPlusTree', (): void => {
 
   describe('BPlusTree find func', (): void => {
     describe('test on small b+tree', (): void => {
-      const { returnValues: actualReturnValues, queue: algoStepQueue } = runFindTest(smallBPlusTree, 2, [6, 2, 3, 4, 10]);
+      const smallBTreeTestparameters = { treeRoot: smallBPlusTree, treeDegree: 2, testNumbers: [6, 2, 3, 4, 10] };
+      const { returnValues: actualReturnValues, queue: algoStepQueue } = runFindTest(smallBTreeTestparameters);
       const expectedReturnValues = [
         { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: true },
         { node: { isLeafNode: true, keys: [2], pointers: [] }, foundFlag: true },
@@ -132,7 +159,8 @@ describe('BPlusTree', (): void => {
     });
 
     describe('test on big b+tree', (): void => {
-      const {returnValues: actualValues, queue: algoStepQueue } = runFindTest(bigBPlusTree, 2, [6, 10, 5]);
+      const bigBPlusTreeParameters = { treeRoot: bigBPlusTree, treeDegree: 2, testNumbers: [6, 10, 5] };
+      const { returnValues: actualValues, queue: algoStepQueue } = runFindTest(bigBPlusTreeParameters);
       const expectedReturnValues = [
         { node: { isLeafNode: true, keys: [6], pointers: [] }, foundFlag: true },
         { node: { isLeafNode: true, keys: [10], pointers: [] }, foundFlag: true },
@@ -165,28 +193,35 @@ describe('BPlusTree', (): void => {
   });
 
   describe('BPlusTree insert func', (): void => {
-    myBplusTree.insert(2);
+    let { returnValue, queue } = runInsertTest({ treeDegree: 2, testNumbers: [2] });
     it('should initialize the root when first number is inserted',
       (): void => {
-        expect(myBplusTree.getRoot()).to.not.be.a('null');
-        expect(myBplusTree.getRoot()).to.have.property('keys').eql([2]);
-        expect(myBplusTree.getRoot()).to.have.property('pointers').eql([]);
-        expect(myBplusTree.getRoot()).to.have.property('isLeafNode').eql(true);
+        expect(returnValue).to.not.be.a('null');
+        expect(returnValue).to.have.property('keys').eql([2]);
+        expect(returnValue).to.have.property('pointers').eql([]);
+        expect(returnValue).to.have.property('isLeafNode').eql(true);
+        expect(queue).to.eql([
+            { type: algoStepTypeEnum.InitRoot },
+            { type: algoStepTypeEnum.InsertInLeaf },
+        ]);
       });
 
-    let numbersToInsert = [3, 4, 6];
-    for (let num of numbersToInsert) {
-      myBplusTree.insert(num);
-    }
-    it('should insert series of numbers',
-      (): void => {
-        expect(myBplusTree.getRoot()).to.eql(smallBPlusTree);
-      });
-    for (let num of [10, 11, 15]) {
-      myBplusTree.insert(num);
-    }
-
-    it('should insert bigger series of numbers',
+    describe('BPlusTree insert func', (): void => {
+      let numbersToInsert = [2, 3, 4, 6];
+      const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
+      it('should insert 2, 3, 4, and 6 and qual the samll b+tree',
+        (): void => {
+          expect(insertTestReturn.returnValue).to.eql(smallBPlusTree);
+        });
+      it('should result in correct algo step queue for small b+tree',
+        (): void => {
+          expect(insertTestReturn.queue).to.eql([
+            { type: algoStepTypeEnum.InitRoot },
+            { type: algoStepTypeEnum.InsertInLeaf },
+          ]);
+        });
+    });
+    it('should insert big b+tree numbers',
       (): void => {
         expect(myBplusTree.getRoot()).to.eql(bigBPlusTree);
       });
