@@ -9,70 +9,94 @@ import {
 import { expect } from 'chai';
 import { zip } from '../src/ts/util';
 
+const linkLeafNodes = (leafNodes: BPlusTreeNode[]): void => {
+  for (let i in leafNodes) {
+    if (parseInt(i) == leafNodes.length - 1) {
+      // dont try to add out of bounds leaf
+      break;
+    }
+    leafNodes[i].pointers.push(leafNodes[parseInt(i) + 1]);
+  }
+}
+
 describe('BPlusTree', (): void => {
   /* initialize big B+tree for testing */
+  const bigBPlusTreeLeafNodes = [
+    {
+      isLeafNode: true,
+      keys: [2, null],
+      pointers: [null, null]
+    },
+    {
+      isLeafNode: true,
+      keys: [3, null],
+      pointers: [null, null]
+    },
+    {
+      isLeafNode: true,
+      keys: [4, null],
+      pointers: [null, null]
+    },
+    {
+      isLeafNode: true,
+      keys: [6, null],
+      pointers: [null, null]
+    },
+    {
+      isLeafNode: true,
+      keys: [10, null],
+      pointers: [null, null]
+    },
+    {
+      isLeafNode: true,
+      keys: [11, 15],
+      pointers: [null, null]
+    }
+  ];
+  linkLeafNodes(bigBPlusTreeLeafNodes);
+
   const bigBPlusTree = {
     isLeafNode: false,
     keys: [4, 10],
     pointers: [
       {
         isLeafNode: false,
-        keys: [3],
+        keys: [3, null],
         pointers: [
-          {
-            isLeafNode: true,
-            keys: [2],
-            pointers: []
-          },
-          {
-            isLeafNode: true,
-            keys: [3],
-            pointers: []
-          }
+          bigBPlusTreeLeafNodes[0],
+          bigBPlusTreeLeafNodes[1],
         ]
       },
       {
         isLeafNode: false,
-        keys: [6],
+        keys: [6, null],
         pointers: [
-          {
-            isLeafNode: true,
-            keys: [4],
-            pointers: []
-          },
-          {
-            isLeafNode: true,
-            keys: [6],
-            pointers: []
-          }
+          bigBPlusTreeLeafNodes[2],
+          bigBPlusTreeLeafNodes[3],
         ]
       },
       {
         isLeafNode: false,
-        keys: [11],
+        keys: [11, null],
         pointers: [
-          {
-            isLeafNode: true,
-            keys: [10],
-            pointers: []
-          },
-          {
-            isLeafNode: true,
-            keys: [11, 15],
-            pointers: []
-          }
+          bigBPlusTreeLeafNodes[4],
+          bigBPlusTreeLeafNodes[5],
         ]
       }
     ]
   };
+
+  const smallBPlusTreeLeafNodes = [
+    { isLeafNode: true, keys: [2, null], pointers: [] },
+    { isLeafNode: true, keys: [3, null], pointers: [] },
+    { isLeafNode: true, keys: [4, 6], pointers: [] }
+  ];
+  linkLeafNodes(smallBPlusTreeLeafNodes);
+
   const smallBPlusTree = {
     isLeafNode: false,
     keys: [3, 4],
-    pointers: [
-      { isLeafNode: true, keys: [2], pointers: [] },
-      { isLeafNode: true, keys: [3], pointers: [] },
-      { isLeafNode: true, keys: [4, 6], pointers: [] }
-    ]
+    pointers: smallBPlusTreeLeafNodes,
   };
   interface testOptions {
     treeDegree: number;
@@ -122,15 +146,15 @@ describe('BPlusTree', (): void => {
   });
 
   describe('BPlusTree find func', (): void => {
-    describe('test on small b+tree', (): void => {
+    describe('test find on small b+tree', (): void => {
       const smallBTreeTestparameters = { treeRoot: smallBPlusTree, treeDegree: 2, testNumbers: [6, 2, 3, 4, 10] };
       const { returnValues: actualReturnValues, queue: algoStepQueue } = runFindTest(smallBTreeTestparameters);
       const expectedReturnValues = [
-        { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [2], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [3], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [4, 6], pointers: [] }, foundFlag: false },
+        { node: smallBPlusTreeLeafNodes[2], foundFlag: true },
+        { node: smallBPlusTreeLeafNodes[0], foundFlag: true },
+        { node: smallBPlusTreeLeafNodes[1], foundFlag: true },
+        { node: smallBPlusTreeLeafNodes[2], foundFlag: true },
+        { node: smallBPlusTreeLeafNodes[2], foundFlag: false },
       ];
       const returnAndExpectedValues = zip([actualReturnValues, expectedReturnValues]);
       it('should successfully find the numbers 6, 2, 3, and 4 and fail to find 10',
@@ -158,13 +182,13 @@ describe('BPlusTree', (): void => {
         });
     });
 
-    describe('test on big b+tree', (): void => {
+    describe('test find on big b+tree', (): void => {
       const bigBPlusTreeParameters = { treeRoot: bigBPlusTree, treeDegree: 2, testNumbers: [6, 10, 5] };
       const { returnValues: actualValues, queue: algoStepQueue } = runFindTest(bigBPlusTreeParameters);
       const expectedReturnValues = [
-        { node: { isLeafNode: true, keys: [6], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [10], pointers: [] }, foundFlag: true },
-        { node: { isLeafNode: true, keys: [4], pointers: [] }, foundFlag: false },
+        { node: bigBPlusTreeLeafNodes[3], foundFlag: true },
+        { node: bigBPlusTreeLeafNodes[4], foundFlag: true },
+        { node: bigBPlusTreeLeafNodes[2], foundFlag: false },
       ];
       const returnAndExpectedValues = zip([actualValues, expectedReturnValues]);
       it('should successfully find the 6,  and 10, and fail to find 5',
@@ -192,7 +216,7 @@ describe('BPlusTree', (): void => {
     });
   });
 
-  describe('BPlusTree insert func', (): void => {
+  xdescribe('BPlusTree insert func', (): void => {
     let { returnValue, queue } = runInsertTest({ treeDegree: 2, testNumbers: [2] });
     it('should initialize the root when first number is inserted',
       (): void => {
