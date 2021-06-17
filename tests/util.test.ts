@@ -10,10 +10,10 @@ describe('Util', (): void => {
       (): void => {
         expect(fixedInsert(testArray, 1)).to.eql([1, 6, 2]);
       });
-    testArray = [6, 2, 3];
     it('should insert 1 after 6 of [6,1,2] array',
       (): void => {
-        expect(fixedInsert(testArray, 1, 1)).to.eql([6, 2, 1]);
+        testArray = [6, 2, 3];
+        expect(fixedInsert(testArray, 1, 1)).to.eql([6, 1, 2]);
       });
   });
   describe('Test splice on sealed array', (): void => {
