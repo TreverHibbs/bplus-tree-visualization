@@ -14,7 +14,7 @@
     "start-server": "webpack serve --open --config webpack.dev.js",
     "watch-webpack": "node_modules/.bin/webpack b -w",
     "start": "concurrently \"npm:watch-scss\" \"npm:start-server\"",
-    "start-dev": "concurrently -p \"{time}-{name}\" -t \"ss\" \"npm:watch-scss\" \"npm:start-server\" \"npm:start-test-server\"",
+    "start-dev": "concurrently -p \"{time}-{name}\" -t \"ss\" \"npm:start-server\" \"npm:start-test-server\"",
     "build": "webpack --config webpack.prod.js",
     "deploy": "gh-pages -d dist",
     "deploy-gh-actions": "gh-pages -d dist -u \"github-actions-bot <support+actions@github.com>\""
@@ -34,6 +34,7 @@
     "@types/d3-shape": "^2.1.0",
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.4",
+    "chai-exclude": "^2.0.3",
     "concurrently": "^6.2.0",
     "css-loader": "^5.2.6",
     "gh-pages": "^3.2.0",
