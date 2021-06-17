@@ -1,14 +1,19 @@
 import { expect } from 'chai';
-import { fixedUnshift, makeFilledArray } from '../src/ts/util';
+import { fixedInsert, makeFilledArray } from '../src/ts/util';
 
 
 describe('Util', (): void => {
-  describe('Unshift', (): void => {
-    const testArray = [6, 2, 3];
+  describe('fixedInsert', (): void => {
+    let testArray = [6, 2, 3];
     Object.seal(testArray);
     it('should insert 1 at begining of [6,2,3] array',
       (): void => {
-        expect(fixedUnshift(testArray, 1)).to.eql([1, 6, 2]);
+        expect(fixedInsert(testArray, 1)).to.eql([1, 6, 2]);
+      });
+    testArray = [6, 2, 3];
+    it('should insert 1 after 6 of [6,1,2] array',
+      (): void => {
+        expect(fixedInsert(testArray, 1, 1)).to.eql([6, 2, 1]);
       });
   });
   describe('Test splice on sealed array', (): void => {

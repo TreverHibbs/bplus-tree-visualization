@@ -1,7 +1,7 @@
 /* each non leaNodef node in a B+tree other than the root has between n
  * and n/2 children, where n is fixxed for a particular tree; the root
  * has between 2 and n children. */
-import { fixedUnshift, makeFilledArray } from './util';
+import { fixedInsert, makeFilledArray } from './util';
 
 /* A typical node of a B+tree contains up to n-1 search-key values,
  * and n pointers. There search-key values within a node are kept
@@ -102,7 +102,7 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
    */
   const insertInLeaf = (value: number, keys: (number | null)[]): void => {
     if (keys[0] && value < keys[0]) {
-      keys = fixedUnshift(keys, value);
+      keys = fixedInsert<typeof keys[0]>(keys, value);
     } else {
       const targetIndex = keys.findIndex((key: number | null) => key && value <= key);
       keys.splice(targetIndex + 1, 1, value);
@@ -117,7 +117,18 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
       newRoot.pointers.splice(0, 2, node, newNode);
       return
     }
+
     const parentNode = node.parentNode;
+    let pointerCount = 0;
+    parentNode.pointers.forEach((element) => {
+      if(element){
+        pointerCount++;
+      }
+    });
+    //TODO finish this if block
+    if (pointerCount < maxChildren) {
+      const nodeIndex = parentNode.pointers.findIndex(element => node === element);
+    }
     return
   }
 
@@ -165,8 +176,8 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
 
       insertInLeaf(value, keysCopy);
 
-      newNode.pointers[maxChildren] = targetLeafnode.pointers[maxChildren];
-      targetLeafnode.pointers[maxChildren] = newNode;
+      newNode.pointers[maxChildren-1] = targetLeafnode.pointers[maxChildren-1];
+      targetLeafnode.pointers[maxChildren-1] = newNode;
 
       targetLeafnode.pointers.splice(0, maxChildren - 1, ...makeFilledArray<null>(null, maxChildren - 1));
       targetLeafnode.keys.splice(0, maxChildren - 1, ...makeFilledArray<null>(null, maxChildren - 1));
@@ -181,7 +192,7 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
 
       if (newNode.keys[0]) {
         insertInParent(targetLeafnode, newNode.keys[0], newNode);
-      }else{
+      } else {
         console.error("first index of new node is null not spliting properly");
       }
     }

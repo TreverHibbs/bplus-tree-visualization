@@ -5,15 +5,17 @@ export function zip(arrays: any[][]): any[] {
 }
 
 /* like unshift but for a fixed length array */
-export function fixedUnshift(arr: any[], value: number): any[] {
-  let nextElement: number = 0;
-  for (let i = 0; i < arr.length; i++) {
-    if (i == 0) {
+export function fixedInsert<ArrType>(arr: ArrType[], value: ArrType, insertIndex = 0): ArrType[] {
+  let nextElement: ArrType | null = null;
+  for (let i = insertIndex; i < arr.length; i++) {
+    if (i == insertIndex) {
       nextElement = arr[i]
       arr[i] = value;
     } else {
       let tmp = arr[i]
-      arr[i] = nextElement;
+      if (nextElement) {
+        arr[i] = nextElement;
+      }
       nextElement = tmp;
     }
   }
