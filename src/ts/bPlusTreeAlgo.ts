@@ -43,7 +43,7 @@ export interface BPlusTree {
   getAlgoStepQueue: () => algoQueueElement[];
   getRoot: () => BPlusTreeRoot;
   setRoot: (newRoot: BPlusTreeRoot) => void;
-  maxChildren: number;
+  maxKeys: number;
   insert: (a: number) => void;
   find: (v: number) => findReturnType;
 }
@@ -51,9 +51,9 @@ export interface BPlusTree {
 export type findReturnType = { node: BPlusTreeNode | null, foundFlag: boolean };
 
 
-export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
+export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
 
-  const maxChildren = maxChildrenValue;
+  const maxKeys = maxKeysValue;
   let root: BPlusTreeRoot = null;
   // store a record of strings that will be used to animate the b+tree later
   const algoStepQueue: algoQueueElement[] = [];
@@ -74,8 +74,8 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
   const BPlusTreeNodeFactory = (leafValue = false): BPlusTreeNode => {
     let parentNode = null;
     let isLeafNode = leafValue;
-    const keys: (number | null)[] = new Array(maxChildren);
-    const pointers: (BPlusTreeNode | null)[] = new Array(maxChildren);
+    const keys: (number | null)[] = new Array(maxKeys);
+    const pointers: (BPlusTreeNode | null)[] = new Array(maxKeys + 1);
     keys.fill(null);
     pointers.fill(null);
     Object.seal(keys);
@@ -98,14 +98,20 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
   /**
    * insert a number into a leaf node while maintaining sorted order
    * @param {number} value - The number to insert
-   * @param {BPlusTreeNode} targetNode - the node to insert into
+   * @param {BPlusTreeNode} targetNodeKeys - the node to insert into
    */
-  const insertInLeaf = (value: number, keys: (number | null)[]): void => {
-    if (keys[0] && value < keys[0]) {
-      keys = fixedInsert<typeof keys[0]>(keys, value);
+  const insertInLeaf = (value: number, targetNodeKeys: (number | null)[]): void => {
+    algoStepQueue.push({ type: algoStepTypeEnum.InsertInLeaf });
+    if (targetNodeKeys[0] && value < targetNodeKeys[0] || targetNodeKeys.filter(x => x === null).length === maxKeys) {
+      targetNodeKeys = fixedInsert<typeof targetNodeKeys[0]>(targetNodeKeys, value);
     } else {
-      const targetIndex = keys.findIndex((key: number | null) => key && value <= key);
-      keys.splice(targetIndex + 1, 1, value);
+      let targetIndex = 0;
+      targetNodeKeys.forEach((key: number | null, index): void => {
+        if(key && key <= value) {
+          targetIndex = index;
+        }
+      });
+      targetNodeKeys.splice(targetIndex + 1, 1, value);
     }
   }
 
@@ -121,27 +127,56 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
     const parentNode = node.parentNode;
     let pointerCount = 0;
     parentNode.pointers.forEach((element) => {
-      if(element){
+      if (element) {
         pointerCount++;
       }
     });
-    //TODO finish this if block
-    if (pointerCount < maxChildren) {
-      const nodeIndex = parentNode.pointers.findIndex(element => node === element);
+    const nodeIndex = parentNode.pointers.findIndex(element => node === element);
+    if (pointerCount < maxKeys) {
+      fixedInsert(parentNode.pointers, newNode, nodeIndex + 1);
+      fixedInsert(parentNode.keys, key, nodeIndex + 1);
+    } else { // split
+      const keysCopy = makeFixedArray<number>(maxKeys);
+      const pointersCopy = makeFixedArray<BPlusTreeNode>(maxKeys + 1);
+      keysCopy.splice(0, maxKeys, ...parentNode.keys);
+      pointersCopy.splice(0, maxKeys, ...parentNode.pointers);
+
+      fixedInsert(keysCopy, key, nodeIndex + 1);
+      fixedInsert(pointersCopy, newNode, nodeIndex + 1);
+
+      parentNode.pointers.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
+      parentNode.keys.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
+
+      const newParentNode = BPlusTreeNodeFactory(false);
+
+      const splitPoint = Math.ceil((maxKeys + 1) / 2);
+      parentNode.pointers.splice(0, splitPoint, ...pointersCopy.slice(0, splitPoint + 1));
+      parentNode.keys.splice(0, splitPoint - 1, ...keysCopy.slice(0, splitPoint));
+
+      const carryUpKey = keysCopy[splitPoint];
+
+      newParentNode.pointers.splice(0, splitPoint, ...pointersCopy.slice(splitPoint + 1));
+      newParentNode.keys.splice(0, splitPoint, ...keysCopy.slice(splitPoint + 1));
+
+      if (carryUpKey) {
+        insertInParent(parentNode, carryUpKey, newParentNode);
+      } else {
+        console.error("key to insert into parent was null");
+      }
     }
     return
   }
 
-  //TODO finish split case of insert method
   /**
    * inserts a number into the B+tree and update the animation step queue
    * @param {number} value - The number to insert
    */
   const insert = (value: number): void => {
-    let targetLeafnode: BPlusTreeNode | null = null; // leaf node to potentially insert value into.
+    let targetLeafNode: BPlusTreeNode | null = null; // leaf node to potentially insert value into.
     if (root === null) {
       // (tree is empty) create an empty leaf node, which is also the root.
-      targetLeafnode = BPlusTreeNodeFactory(true);
+      targetLeafNode = BPlusTreeNodeFactory(true);
+      root = targetLeafNode;
       algoStepQueue.push({ type: algoStepTypeEnum.InitRoot });
     } else {
       // find the leaf node L that should contain key value K.
@@ -152,46 +187,49 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
         return;
       }
       if (findReturnObj.node) {
-        targetLeafnode = findReturnObj.node;
+        targetLeafNode = findReturnObj.node;
       }
     }
-    if (targetLeafnode && targetLeafnode.keys.length < maxChildren - 1) {
+    if (targetLeafNode !== null && (targetLeafNode.keys.filter(x => x !== null).length) <= maxKeys - 1) {
       // insert value into target leaf node
-      insertInLeaf(value, targetLeafnode.keys);
+      insertInLeaf(value, targetLeafNode.keys);
     } else {// split the leaf node
+      //TODO fix this split code
       const newNode = BPlusTreeNodeFactory(true);
 
-      if (!targetLeafnode) {
+      if (!targetLeafNode) {
         console.error("target leaf node was null");
         return;
       }
       // copy target leaf nodes pointers and keys array
-      // only copy up to maxChildren-1 of the pointers array
+      // only copy up to maxKeys-1 of the pointers array
       // this is done so that later we can add the correct pointers
       // and keys to the correct nodes.
-      let pointersCopy = targetLeafnode.pointers.slice(0, targetLeafnode.pointers.length - 1);
+      let pointersCopy = targetLeafNode.pointers.slice(0, targetLeafNode.pointers.length - 1);
       Object.seal(pointersCopy);
-      let keysCopy = targetLeafnode.keys.slice();
-      Object.seal(keysCopy);
+      let keysCopy = targetLeafNode.keys.slice();
+      keysCopy[maxKeys] = null;
 
       insertInLeaf(value, keysCopy);
 
-      newNode.pointers[maxChildren-1] = targetLeafnode.pointers[maxChildren-1];
-      targetLeafnode.pointers[maxChildren-1] = newNode;
+      newNode.pointers[maxKeys] = targetLeafNode.pointers[maxKeys];
+      targetLeafNode.pointers[maxKeys] = newNode;
 
-      targetLeafnode.pointers.splice(0, maxChildren - 1, ...makeFilledArray<null>(null, maxChildren - 1));
-      targetLeafnode.keys.splice(0, maxChildren - 1, ...makeFilledArray<null>(null, maxChildren - 1));
-      const maxDividedBy2 = Math.ceil(maxChildren / 2);
-      targetLeafnode.pointers.splice(0, maxDividedBy2, ...pointersCopy.slice(0, maxDividedBy2));
-      targetLeafnode.keys.splice(0, maxDividedBy2, ...keysCopy.slice(0, maxDividedBy2));
+      // erase P_0 through K_maxKeys from targetLeafNode
+      targetLeafNode.pointers.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
+      targetLeafNode.keys.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
 
-      let numOfKeys = Math.abs(maxChildren - 1 - maxDividedBy2 + 1);
-      newNode.pointers.splice(0, numOfKeys, ...pointersCopy.slice(0, numOfKeys));
-      numOfKeys = Math.abs(maxChildren - maxDividedBy2 + 1);
-      newNode.keys.splice(0, numOfKeys, ...keysCopy.slice(0, numOfKeys));
+      const maxDividedBy2 = Math.ceil(maxKeys / 2);
+      targetLeafNode.pointers.splice(0, maxDividedBy2+1, ...pointersCopy.slice(0, maxDividedBy2+1));
+      targetLeafNode.keys.splice(0, maxDividedBy2+1, ...keysCopy.slice(0, maxDividedBy2+1));
+
+      const tmpNodePointers = pointersCopy.slice(maxDividedBy2+1);
+      const tmpNodeKeys = keysCopy.slice(maxDividedBy2+1);
+      newNode.pointers.splice(0, tmpNodePointers.length, ...tmpNodePointers);
+      newNode.keys.splice(0, tmpNodeKeys.length, ...tmpNodeKeys);
 
       if (newNode.keys[0]) {
-        insertInParent(targetLeafnode, newNode.keys[0], newNode);
+        insertInParent(targetLeafNode, newNode.keys[0], newNode);
       } else {
         console.error("first index of new node is null not spliting properly");
       }
@@ -281,10 +319,21 @@ export const BPlusTreeFactory = (maxChildrenValue: number): BPlusTree => {
     getAlgoStepQueue,
     getRoot,
     setRoot,
-    maxChildren,
+    maxKeys,
     insert,
     find
   };
 
   return (newBPlusTree);
+}
+
+
+/* utility functions */
+
+/* make copy fixed length array */
+export function makeFixedArray<ElementType>(length: number): (ElementType | null)[] {
+  const arrCopy: (ElementType | null)[] = new Array(length);
+  arrCopy.fill(null);
+  Object.seal(arrCopy);
+  return (arrCopy);
 }

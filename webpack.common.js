@@ -16,6 +16,7 @@ if (process.env.TESTBUILD) {
 
 module.exports = {
   entry: entry,
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {

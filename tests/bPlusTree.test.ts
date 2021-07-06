@@ -6,6 +6,7 @@ import {
   findReturnType,
 } from '../src/ts/bPlusTreeAlgo';
 import { expect } from 'chai';
+import * as chai from 'chai';
 import chaiExclude from 'chai-exclude';
 import { zip } from '../src/ts/util';
 
@@ -228,14 +229,14 @@ describe('BPlusTree', (): void => {
     });
   });
 
-  xdescribe('BPlusTree insert func', (): void => {
+  describe('BPlusTree insert func', (): void => {
     let { returnValue, queue } = runInsertTest({ treeDegree: 2, testNumbers: [2] });
     describe('insert initial root', (): void => {
       it('should initialize the root when first number is inserted',
         (): void => {
           expect(returnValue).to.not.be.a('null');
-          expect(returnValue).to.have.property('keys').eql([2]);
-          expect(returnValue).to.have.property('pointers').eql([]);
+          expect(returnValue).to.have.property('keys').eql([2, null]);
+          expect(returnValue).to.have.property('pointers').eql([null, null]);
           expect(returnValue).to.have.property('isLeafNode').eql(true);
           expect(queue).to.eql([
             { type: algoStepTypeEnum.InitRoot },
@@ -244,12 +245,15 @@ describe('BPlusTree', (): void => {
         });
     });
 
+    //TODO fix the use of the chai exclude feature
     describe('insert small b+tree', (): void => {
       let numbersToInsert = [2, 3, 4, 6];
       const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
       const smallBPlusTreeTestResult = insertTestReturn.returnValue;
       it('should insert 2, 3, 4, and 6 and qual the samll b+tree',
         (): void => {
+          console.dir(smallBPlusTreeTestResult);
+          console.dir(smallBPlusTree);
           expect(smallBPlusTreeTestResult).excludingEvery(['parentNode', 'setParentNode']).to.deep.equal(smallBPlusTree);
         });
       it('should result in correct algo step queue for small b+tree',
