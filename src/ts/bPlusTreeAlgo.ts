@@ -10,8 +10,8 @@ export interface BPlusTreeNode {
   isLeafNode: boolean;
   keys: (number | null)[];
   pointers: (BPlusTreeNode | null)[];
-  parentNode: BPlusTreeNode | null;
   setParentNode: (node: BPlusTreeNode) => void;
+  getParentNode: () => BPlusTreeNode | null;
 }
 
 
@@ -72,7 +72,7 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
   }
 
   const BPlusTreeNodeFactory = (leafValue = false): BPlusTreeNode => {
-    let parentNode = null;
+    let parentNode: BPlusTreeNode | null = null;
     let isLeafNode = leafValue;
     const keys: (number | null)[] = new Array(maxKeys);
     const pointers: (BPlusTreeNode | null)[] = new Array(maxKeys + 1);
@@ -81,17 +81,22 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
     Object.seal(keys);
     Object.seal(pointers);
 
-    const setParentNode = (node: BPlusTreeNode) => {
+    const setParentNode = (node: BPlusTreeNode): void => {
       parentNode = node;
       return;
     }
+
+    const getParentNode = (): BPlusTreeNode | null => {
+      return (parentNode);
+    }
+
 
     return ({
       isLeafNode,
       keys,
       pointers,
-      parentNode,
       setParentNode,
+      getParentNode,
     });
   }
 
@@ -107,7 +112,7 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
     } else {
       let targetIndex = 0;
       targetNodeKeys.forEach((key: number | null, index): void => {
-        if(key && key <= value) {
+        if (key && key <= value) {
           targetIndex = index;
         }
       });
@@ -117,14 +122,17 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
 
   /* insert into the parent node of the nodes that were split */
   const insertInParent = (node: BPlusTreeNode, key: number, newNode: BPlusTreeNode): void => {
-    if (node.parentNode == null) {
+    const parentNode = node.getParentNode();
+    if (parentNode == null) {
       const newRoot = BPlusTreeNodeFactory(false);
       newRoot.keys[0] = key;
       newRoot.pointers.splice(0, 2, node, newNode);
+      root = newRoot;
+      node.setParentNode(newRoot);
+      newNode.setParentNode(newRoot);
       return
     }
 
-    const parentNode = node.parentNode;
     let pointerCount = 0;
     parentNode.pointers.forEach((element) => {
       if (element) {
@@ -136,10 +144,11 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       fixedInsert(parentNode.pointers, newNode, nodeIndex + 1);
       fixedInsert(parentNode.keys, key, nodeIndex + 1);
     } else { // split
-      const keysCopy = makeFixedArray<number>(maxKeys);
-      const pointersCopy = makeFixedArray<BPlusTreeNode>(maxKeys + 1);
+      //TODO fix this plit case
+      const keysCopy = makeFixedArray<number>(maxKeys + 1);
+      const pointersCopy = makeFixedArray<BPlusTreeNode>(maxKeys + 2);
       keysCopy.splice(0, maxKeys, ...parentNode.keys);
-      pointersCopy.splice(0, maxKeys, ...parentNode.pointers);
+      pointersCopy.splice(0, maxKeys + 1, ...parentNode.pointers);
 
       fixedInsert(keysCopy, key, nodeIndex + 1);
       fixedInsert(pointersCopy, newNode, nodeIndex + 1);
@@ -147,16 +156,21 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       parentNode.pointers.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
       parentNode.keys.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
 
+
+      // copy T.P_1 ... T.P_splitPoint into P
+      const splitPoint = (Math.ceil((maxKeys + 2) / 2)) - 1;
+      parentNode.pointers.splice(0, splitPoint + 1, ...pointersCopy.slice(0, splitPoint + 1));
+      parentNode.keys.splice(0, splitPoint, ...keysCopy.slice(0, splitPoint));
+
+      // let K'' = T.K_splitPoint
+      const carryUpKey = keysCopy[splitPoint];
       const newParentNode = BPlusTreeNodeFactory(false);
 
-      const splitPoint = Math.ceil((maxKeys + 1) / 2);
-      parentNode.pointers.splice(0, splitPoint, ...pointersCopy.slice(0, splitPoint + 1));
-      parentNode.keys.splice(0, splitPoint - 1, ...keysCopy.slice(0, splitPoint));
-
-      const carryUpKey = keysCopy[splitPoint];
-
-      newParentNode.pointers.splice(0, splitPoint, ...pointersCopy.slice(splitPoint + 1));
-      newParentNode.keys.splice(0, splitPoint, ...keysCopy.slice(splitPoint + 1));
+      // copy T.P_splitPoint...T.P_n+1 into P'
+      const tmpPointersCopy = pointersCopy.slice(splitPoint + 1);
+      const tmpKeysCopy = keysCopy.slice(splitPoint + 1);
+      newParentNode.pointers.splice(0, tmpPointersCopy.length, ...tmpPointersCopy);
+      newParentNode.keys.splice(0, tmpKeysCopy.length, ...tmpKeysCopy);
 
       if (carryUpKey) {
         insertInParent(parentNode, carryUpKey, newParentNode);
@@ -194,7 +208,6 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       // insert value into target leaf node
       insertInLeaf(value, targetLeafNode.keys);
     } else {// split the leaf node
-      //TODO fix this split code
       const newNode = BPlusTreeNodeFactory(true);
 
       if (!targetLeafNode) {
@@ -206,6 +219,7 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       // this is done so that later we can add the correct pointers
       // and keys to the correct nodes.
       let pointersCopy = targetLeafNode.pointers.slice(0, targetLeafNode.pointers.length - 1);
+      pointersCopy[maxKeys] = null;
       Object.seal(pointersCopy);
       let keysCopy = targetLeafNode.keys.slice();
       keysCopy[maxKeys] = null;
@@ -219,12 +233,13 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       targetLeafNode.pointers.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
       targetLeafNode.keys.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
 
+      // copy T.P_1 though T.P_n/2 from T into L starting at L.P_1
       const maxDividedBy2 = Math.ceil(maxKeys / 2);
-      targetLeafNode.pointers.splice(0, maxDividedBy2+1, ...pointersCopy.slice(0, maxDividedBy2+1));
-      targetLeafNode.keys.splice(0, maxDividedBy2+1, ...keysCopy.slice(0, maxDividedBy2+1));
+      targetLeafNode.pointers.splice(0, maxDividedBy2 + 1, ...pointersCopy.slice(0, maxDividedBy2 + 1));
+      targetLeafNode.keys.splice(0, maxDividedBy2 + 1, ...keysCopy.slice(0, maxDividedBy2 + 1));
 
-      const tmpNodePointers = pointersCopy.slice(maxDividedBy2+1);
-      const tmpNodeKeys = keysCopy.slice(maxDividedBy2+1);
+      const tmpNodePointers = pointersCopy.slice(maxDividedBy2 + 1);
+      const tmpNodeKeys = keysCopy.slice(maxDividedBy2 + 1);
       newNode.pointers.splice(0, tmpNodePointers.length, ...tmpNodePointers);
       newNode.keys.splice(0, tmpNodeKeys.length, ...tmpNodeKeys);
 

@@ -14,6 +14,7 @@ chai.use(chaiExclude);
 
 
 const linkLeafNodes = (leafNodes: any[]): void => {
+  //TODO update this to work with fixed length arrays
   for (let i in leafNodes) {
     if (parseInt(i) == leafNodes.length - 1) {
       // dont try to add out of bounds leaf
@@ -31,65 +32,64 @@ interface BPlusTreeTestNode {
 
 type BPlusTreeTestRoot = BPlusTreeTestNode | null;
 
+
+
 describe('BPlusTree', (): void => {
   /* initialize big B+tree for testing */
-
   const bigBPlusTreeLeafNodes = [
     {
-      isLeafNode: true,
       keys: [2, null],
-      pointers: [null, null]
+      pointers: [null, null],
+      isLeafNode: true,
     },
     {
-      isLeafNode: true,
       keys: [3, null],
-      pointers: [null, null]
+      pointers: [null, null],
+      isLeafNode: true,
     },
     {
-      isLeafNode: true,
       keys: [4, null],
-      pointers: [null, null]
+      pointers: [null, null],
+      isLeafNode: true,
     },
     {
-      isLeafNode: true,
       keys: [6, null],
-      pointers: [null, null]
+      pointers: [null, null],
+      isLeafNode: true,
     },
     {
-      isLeafNode: true,
       keys: [10, null],
-      pointers: [null, null]
+      pointers: [null, null],
+      isLeafNode: true,
     },
     {
-      isLeafNode: true,
       keys: [11, 15],
-      pointers: [null, null]
+      pointers: [null, null],
     }
   ];
   linkLeafNodes(bigBPlusTreeLeafNodes);
 
   const bigBPlusTree = {
-    isLeafNode: false,
     keys: [4, 10],
+    isLeafNode: false,
     pointers: [
       {
-        isLeafNode: false,
         keys: [3, null],
         pointers: [
           bigBPlusTreeLeafNodes[0],
           bigBPlusTreeLeafNodes[1],
-        ]
+        ],
+        isLeafNode: false,
       },
       {
-        isLeafNode: false,
         keys: [6, null],
         pointers: [
           bigBPlusTreeLeafNodes[2],
           bigBPlusTreeLeafNodes[3],
-        ]
+        ],
+        isLeafNode: false,
       },
       {
-        isLeafNode: false,
         keys: [11, null],
         pointers: [
           bigBPlusTreeLeafNodes[4],
@@ -97,12 +97,11 @@ describe('BPlusTree', (): void => {
         ]
       }
     ]
-  };
-
+  }
   const smallBPlusTreeLeafNodes = [
     { isLeafNode: true, keys: [2, null], pointers: [] },
     { isLeafNode: true, keys: [3, null], pointers: [] },
-    { isLeafNode: true, keys: [4, 6], pointers: [] }
+    { isLeafNode: true, keys: [4, 6], pointers: [] },
   ];
   linkLeafNodes(smallBPlusTreeLeafNodes);
 
@@ -235,9 +234,9 @@ describe('BPlusTree', (): void => {
       it('should initialize the root when first number is inserted',
         (): void => {
           expect(returnValue).to.not.be.a('null');
-          expect(returnValue).to.have.property('keys').eql([2, null]);
-          expect(returnValue).to.have.property('pointers').eql([null, null]);
           expect(returnValue).to.have.property('isLeafNode').eql(true);
+          expect(returnValue).to.have.property('keys').eql([2, null]);
+          expect(returnValue).to.have.property('pointers').eql([null, null, null]);
           expect(queue).to.eql([
             { type: algoStepTypeEnum.InitRoot },
             { type: algoStepTypeEnum.InsertInLeaf },
@@ -245,20 +244,20 @@ describe('BPlusTree', (): void => {
         });
     });
 
-    //TODO fix the use of the chai exclude feature
     describe('insert small b+tree', (): void => {
       let numbersToInsert = [2, 3, 4, 6];
       const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
       const smallBPlusTreeTestResult = insertTestReturn.returnValue;
-      it('should insert 2, 3, 4, and 6 and qual the samll b+tree',
+      const smallBPlusTreeQueue = insertTestReturn.queue;
+      console.dir("small B plus tree test results\n", smallBPlusTreeTestResult);
+      console.dir("small B plus tree\n", smallBPlusTree);
+      it('should result in correct BPlusTree',
         (): void => {
-          console.dir(smallBPlusTreeTestResult);
-          console.dir(smallBPlusTree);
-          expect(smallBPlusTreeTestResult).excludingEvery(['parentNode', 'setParentNode']).to.deep.equal(smallBPlusTree);
+          expect(smallBPlusTreeTestResult).excludingEvery(['getParentNode', 'setParentNode']).to.deep.equal(smallBPlusTree);
         });
       it('should result in correct algo step queue for small b+tree',
         (): void => {
-          expect(insertTestReturn.queue).to.eql([
+          expect(smallBPlusTreeQueue).to.eql([
             { type: algoStepTypeEnum.InitRoot },
             { type: algoStepTypeEnum.InsertInLeaf },
             { type: algoStepTypeEnum.NotFound },
@@ -271,32 +270,16 @@ describe('BPlusTree', (): void => {
           ]);
         });
     });
+  });
 
-    describe('insert big b+tree', (): void => {
-      let numbersToInsert = [2, 3, 4, 6, 15, 10, 11];
-      const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
-      const BigBPlusTreeTestResult = insertTestReturn.returnValue;
-      it('should insert big b+tree numbers',
-        (): void => {
-          expect(BigBPlusTreeTestResult).excludingEvery(['parentNode', 'setParentNode']).to.deep.equal(bigBPlusTree);
-        });
+  describe('insert big b+tree', (): void => {
+    let numbersToInsert = [2, 3, 4, 6, 15, 10, 11];
+    const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
+    const BigBPlusTreeTestResult = insertTestReturn.returnValue;
+    it('should insert big b+tree numbers',
+      (): void => {
+        expect(BigBPlusTreeTestResult).excludingEvery(['getParentNode', 'setParentNode']).to.deep.equal(bigBPlusTree);
+      });
 
-      it('should insert series of numbers with n = 3',
-        (): void => {
-          const myN3Tree = BPlusTreeFactory(3);
-          let numbersToInsert = [2, 5, 10, 4];
-          for (let num of numbersToInsert) {
-            myN3Tree.insert(num);
-          }
-          expect(myN3Tree.getRoot()).excludingEvery(['parentNode', 'setParentNode']).to.deep.equal({
-            isLeafNode: false,
-            keys: [5],
-            pointers: [
-              { isLeafNode: true, keys: [2, 4], pointers: [] },
-              { isLeafNode: true, keys: [5, 10], pointers: [] },
-            ]
-          });
-        });
-    });
   });
 });
