@@ -116,7 +116,10 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
           targetIndex = index;
         }
       });
-      targetNodeKeys.splice(targetIndex + 1, 1, value);
+      const deletedNum = targetNodeKeys.splice(targetIndex + 1, 1, value);
+      if(targetNodeKeys.length > targetIndex+2){
+        targetNodeKeys[targetIndex+2] = deletedNum[0];
+      }
     }
   }
 
@@ -246,12 +249,12 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       targetLeafNode.keys.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
 
       // copy T.P_1 though T.P_n/2 from T into L starting at L.P_1
-      const maxDividedBy2 = Math.ceil(maxKeys / 2);
-      targetLeafNode.pointers.splice(0, maxDividedBy2 + 1, ...pointersCopy.slice(0, maxDividedBy2 + 1));
-      targetLeafNode.keys.splice(0, maxDividedBy2 + 1, ...keysCopy.slice(0, maxDividedBy2 + 1));
+      const maxDividedBy2 = Math.ceil((maxKeys+1) / 2);
+      targetLeafNode.pointers.splice(0, maxDividedBy2, ...pointersCopy.slice(0, maxDividedBy2));
+      targetLeafNode.keys.splice(0, maxDividedBy2, ...keysCopy.slice(0, maxDividedBy2));
 
-      const tmpNodePointers = pointersCopy.slice(maxDividedBy2 + 1);
-      const tmpNodeKeys = keysCopy.slice(maxDividedBy2 + 1);
+      const tmpNodePointers = pointersCopy.slice(maxDividedBy2);
+      const tmpNodeKeys = keysCopy.slice(maxDividedBy2);
       newNode.pointers.splice(0, tmpNodePointers.length, ...tmpNodePointers);
       newNode.keys.splice(0, tmpNodeKeys.length, ...tmpNodeKeys);
 
