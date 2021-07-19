@@ -119,10 +119,10 @@ describe('BPlusTree', (): void => {
       pointers: [null, null, null],
       isLeafNode: true,
     },
-    { 
-      isLeafNode: true, 
-      keys: [13, null], 
-      pointers: [] 
+    {
+      isLeafNode: true,
+      keys: [13, null],
+      pointers: []
     },
     {
       keys: [15, 43],
@@ -138,6 +138,36 @@ describe('BPlusTree', (): void => {
   LargeBPlusTree.pointers[1].pointers[0] = largeBPlusTreeLeafNodes[2];
   LargeBPlusTree.pointers[1].pointers[1] = largeBPlusTreeLeafNodes[3];
   LargeBPlusTree.pointers[1].pointers[2] = largeBPlusTreeLeafNodes[4];
+
+  //+++ Test Interfaces +++//
+  const MaxKeys3TreeLeafNodes = [
+    {
+      keys: [2, 3, null],
+      pointers: [null, null, null, null],
+      isLeafNode: true,
+    },
+    {
+      keys: [4, 6, null],
+      pointers: [null, null, null],
+      isLeafNode: true,
+    },
+    {
+      keys: [10, 11, 13],
+      pointers: [null, null, null],
+      isLeafNode: true,
+    },
+    {
+      isLeafNode: true,
+      keys: [15, 43, null],
+      pointers: [null, null, null, null,],
+    },
+  ];
+  linkLeafNodes(MaxKeys3TreeLeafNodes, 3);
+  const MaxKeys3Tree = {
+    keys: [4, 10, 15],
+    pointers: MaxKeys3TreeLeafNodes,
+    isLeafNode: false,
+  };
 
   //+++ Test Interfaces +++//
   interface testOptions {
@@ -304,45 +334,65 @@ describe('BPlusTree', (): void => {
           ]);
         });
     });
-  });
 
-  let numbersToInsert = [2, 3, 4, 6, 15, 10, 11];
-  describe(`insert big b+tree ${numbersToInsert}`, (): void => {
-    const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
-    const BigBPlusTreeTestResult = insertTestReturn.returnValue;
-    const bigBPlusTreeAlgoQueue = insertTestReturn.queue;
-    it('should insert big b+tree numbers',
-      (): void => {
-        expect(BigBPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(bigBPlusTree);
-      });
+    numbersToInsert = [2, 3, 4, 6, 15, 10, 11];
+    describe(`insert big b+tree ${numbersToInsert}`, (): void => {
+      const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
+      const BigBPlusTreeTestResult = insertTestReturn.returnValue;
+      const bigBPlusTreeAlgoQueue = insertTestReturn.queue;
+      it('should insert big b+tree numbers',
+        (): void => {
+          expect(BigBPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(bigBPlusTree);
+        });
 
-    xit('should result in correct algo step queue for big b+tree',
+      xit('should result in correct algo step queue for big b+tree',
         (): void => {
           expect(bigBPlusTreeAlgoQueue).to.eql([
             { type: algoStepTypeEnum.InitRoot },
           ]);
         });
-    //console.dir("big b plus tree result\n", BigBPlusTreeTestResult);
-    //console.dir("big b plus tree\n", bigBPlusTree);
-  });
+      //console.dir("big b plus tree result\n", BigBPlusTreeTestResult);
+      //console.dir("big b plus tree\n", bigBPlusTree);
+    });
 
-  //TODO debug the insertion of 13
-  numbersToInsert.push(43, 13);
-  describe(`insert large b+tree ${numbersToInsert}`, (): void => {
-    const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
-    const LargeBPlusTreeTestResult = insertTestReturn.returnValue;
-    const LargeBPlusTreeAlgoQueue = insertTestReturn.queue;
-    it('should insert big b+tree numbers',
-      (): void => {
-        expect(LargeBPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(LargeBPlusTree);
-      });
-    xit('should result in correct algo step queue for large b+tree',
+    numbersToInsert.push(43, 13);
+    describe(`insert large b+tree ${numbersToInsert}`, (): void => {
+      const insertTestReturn = runInsertTest({ treeDegree: 2, testNumbers: numbersToInsert });
+      const LargeBPlusTreeTestResult = insertTestReturn.returnValue;
+      const LargeBPlusTreeAlgoQueue = insertTestReturn.queue;
+      it('should insert big b+tree numbers',
+        (): void => {
+          expect(LargeBPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(LargeBPlusTree);
+        });
+      xit('should result in correct algo step queue for large b+tree',
         (): void => {
           expect(LargeBPlusTreeAlgoQueue).to.eql([
             { type: algoStepTypeEnum.InitRoot },
           ]);
         });
-    console.dir("large b plus tree result\n", LargeBPlusTreeTestResult);
-    console.dir("large b plus tree\n", LargeBPlusTree);
+      //console.dir("large b plus tree result\n", LargeBPlusTreeTestResult);
+      //console.dir("large b plus tree\n", LargeBPlusTree);
+    });
+
+    //TODO debug this test case
+    let maxKeysTestValue = 3;
+    describe(`insert large b+tree ${numbersToInsert} with maxKeys of ${maxKeysTestValue}`, (): void => {
+      const insertTestReturn = runInsertTest({ treeDegree: maxKeysTestValue, testNumbers: numbersToInsert });
+      const LargeBPlusTreeTestResult = insertTestReturn.returnValue;
+      const LargeBPlusTreeAlgoQueue = insertTestReturn.queue;
+      it('should insert big b+tree numbers',
+        (): void => {
+          expect(LargeBPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(MaxKeys3Tree);
+        });
+      xit('should result in correct algo step queue for large b+tree',
+        (): void => {
+          expect(LargeBPlusTreeAlgoQueue).to.eql([
+            { type: algoStepTypeEnum.InitRoot },
+          ]);
+        });
+      console.dir("large b plus tree with maxKeys 3 result\n", LargeBPlusTreeTestResult);
+      console.dir("large b plus tree with maxKeys 3\n", MaxKeys3Tree);
+    });
   });
+
 });
