@@ -117,8 +117,8 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
         }
       });
       const deletedNum = targetNodeKeys.splice(targetIndex + 1, 1, value);
-      if(targetNodeKeys.length > targetIndex+2){
-        targetNodeKeys[targetIndex+2] = deletedNum[0];
+      if (targetNodeKeys.length > targetIndex + 2) {
+        fixedInsert(targetNodeKeys, deletedNum[0], targetIndex + 2);
       }
     }
   }
@@ -249,7 +249,7 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       targetLeafNode.keys.splice(0, maxKeys, ...makeFilledArray(null, maxKeys));
 
       // copy T.P_1 though T.P_n/2 from T into L starting at L.P_1
-      const maxDividedBy2 = Math.ceil((maxKeys+1) / 2);
+      const maxDividedBy2 = Math.ceil((maxKeys + 1) / 2);
       targetLeafNode.pointers.splice(0, maxDividedBy2, ...pointersCopy.slice(0, maxDividedBy2));
       targetLeafNode.keys.splice(0, maxDividedBy2, ...keysCopy.slice(0, maxDividedBy2));
 

@@ -101,7 +101,6 @@ describe('BPlusTree', (): void => {
   }
 
   //+++ Large B Plus Tree Definition +++//
-  //TODO refactor to use less code
   const LargeBPlusTree = JSON.parse(JSON.stringify(bigBPlusTree));
   const largeBPlusTreeLeafNodes = [
     {
@@ -138,6 +137,78 @@ describe('BPlusTree', (): void => {
   LargeBPlusTree.pointers[1].pointers[0] = largeBPlusTreeLeafNodes[2];
   LargeBPlusTree.pointers[1].pointers[1] = largeBPlusTreeLeafNodes[3];
   LargeBPlusTree.pointers[1].pointers[2] = largeBPlusTreeLeafNodes[4];
+
+
+  //+++ Huge B Plus Tree Definition +++//
+  const hugeBPlusTreeLeafNodes = [
+    {
+      keys: [2, 3, 4, 5],
+      pointers: [null, null, null, null, null],
+      isLeafNode: true,
+    },
+    {
+      keys: [6, 10, 11, 13],
+      pointers: [null, null, null, null, null],
+      isLeafNode: true,
+    },
+    {
+      keys: [15, 22, 28, null],
+      pointers: [null, null, null, null, null],
+      isLeafNode: true,
+    },
+    {
+      isLeafNode: true,
+      keys: [32, 33, null, null],
+      pointers: [null, null, null, null, null]
+    },
+    {
+      keys: [35, 43, 47, null],
+      pointers: [null, null, null, null, null],
+      isLeafNode: true,
+    },
+    {
+      keys: [70, 76, 84, null],
+      pointers: [null, null, null, null, null],
+      isLeafNode: true,
+    },
+    {
+      keys: [88, 94, 100, null],
+      pointers: [null, null, null, null, null],
+      isLeafNode: true,
+    }
+  ];
+  const HugeBPlusTree = {
+    keys: [35, null, null, null],
+    pointers: [
+      {
+        keys: [6, 15, 32, null],
+        pointers: [
+          hugeBPlusTreeLeafNodes[0],
+          hugeBPlusTreeLeafNodes[1],
+          hugeBPlusTreeLeafNodes[2],
+          hugeBPlusTreeLeafNodes[3],
+          null,
+        ],
+        isLeafNode: false,
+      },
+      {
+        keys: [70, 88, null, null],
+        pointers: [
+          hugeBPlusTreeLeafNodes[4],
+          hugeBPlusTreeLeafNodes[5],
+          hugeBPlusTreeLeafNodes[6],
+          null,
+          null,
+        ],
+        isLeafNode: false,
+      },
+      null, null, null,
+    ],
+    isLeafNode: false,
+  };
+
+  linkLeafNodes(hugeBPlusTreeLeafNodes, 4);
+
 
   //+++ Test Interfaces +++//
   const MaxKeys3TreeLeafNodes = [
@@ -374,7 +445,6 @@ describe('BPlusTree', (): void => {
       //console.dir("large b plus tree\n", LargeBPlusTree);
     });
 
-    //TODO debug this test case
     let maxKeysTestValue = 3;
     describe(`insert large b+tree ${numbersToInsert} with maxKeys of ${maxKeysTestValue}`, (): void => {
       const insertTestReturn = runInsertTest({ treeDegree: maxKeysTestValue, testNumbers: numbersToInsert });
@@ -390,8 +460,30 @@ describe('BPlusTree', (): void => {
             { type: algoStepTypeEnum.InitRoot },
           ]);
         });
-      console.dir("large b plus tree with maxKeys 3 result\n", LargeBPlusTreeTestResult);
-      console.dir("large b plus tree with maxKeys 3\n", MaxKeys3Tree);
+      //console.dir("large b plus tree with maxKeys 3 result\n", LargeBPlusTreeTestResult);
+      //console.dir("large b plus tree with maxKeys 3\n", MaxKeys3Tree);
+    });
+
+    maxKeysTestValue = 4;
+    numbersToInsert.push(70, 28, 84, 6, 35, 88, 100, 22, 76, 47, 32, 94, 5, 33, 70);
+    //2,3,4,6,15,10,11,43,13,70,28,84,6,35,88,100,22,76,47,32,94,5,33,70
+
+    describe(`insert huge b+tree ${numbersToInsert} with maxKeys of ${maxKeysTestValue}`, (): void => {
+      const insertTestReturn = runInsertTest({ treeDegree: maxKeysTestValue, testNumbers: numbersToInsert });
+      const HugeBPlusTreeTestResult = insertTestReturn.returnValue;
+      const HugeBPlusTreeAlgoQueue = insertTestReturn.queue;
+      it('should insert big b+tree numbers',
+        (): void => {
+          expect(HugeBPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(HugeBPlusTree);
+        });
+      xit('should result in correct algo step queue for huge b+tree',
+        (): void => {
+          expect(HugeBPlusTreeAlgoQueue).to.eql([
+            { type: algoStepTypeEnum.InitRoot },
+          ]);
+        });
+      console.dir("huge b plus tree with maxKeys 4 result\n", HugeBPlusTreeTestResult);
+      console.dir("huge b plus tree with maxKeys 4\n", HugeBPlusTree);
     });
   });
 
