@@ -4,14 +4,14 @@ import {
   algoStepTypeEnum,
   algoQueueElement,
   findReturnType,
-} from '../src/ts/bPlusTreeAlgo';
-import { expect } from 'chai';
-import * as chai from 'chai';
-import chaiExclude from 'chai-exclude';
-import { zip, makeFilledArray } from '../src/ts/util';
+  BPlusTree,
+} from "../src/ts/bPlusTreeAlgo";
+import { expect } from "chai";
+import * as chai from "chai";
+import chaiExclude from "chai-exclude";
+import { zip, makeFilledArray } from "../src/ts/util";
 
 chai.use(chaiExclude);
-
 
 const linkLeafNodes = (leafNodes: any[], maxKeys: number): void => {
   for (let i in leafNodes) {
@@ -19,10 +19,14 @@ const linkLeafNodes = (leafNodes: any[], maxKeys: number): void => {
       // dont try to add out of bounds leaf
       break;
     }
-    leafNodes[i].pointers.splice(0, maxKeys + 1, ...makeFilledArray(null, maxKeys + 1));
+    leafNodes[i].pointers.splice(
+      0,
+      maxKeys + 1,
+      ...makeFilledArray(null, maxKeys + 1)
+    );
     leafNodes[i].pointers.splice(-1, 1, leafNodes[parseInt(i) + 1]);
   }
-}
+};
 
 interface BPlusTreeTestNode {
   isLeafNode: boolean;
@@ -32,11 +36,7 @@ interface BPlusTreeTestNode {
 
 type BPlusTreeTestRoot = BPlusTreeTestNode | null;
 
-
-
-
-
-describe('BPlusTree', (): void => {
+describe("BPlusTree", (): void => {
   //+++ Small B Plus Tree Definition +++//
   const smallBPlusTreeLeafNodes = [
     { isLeafNode: true, keys: [2, 3], pointers: [] },
@@ -82,25 +82,17 @@ describe('BPlusTree', (): void => {
     pointers: [
       {
         keys: [4, null],
-        pointers: [
-          bigBPlusTreeLeafNodes[0],
-          bigBPlusTreeLeafNodes[1],
-          null,
-        ],
+        pointers: [bigBPlusTreeLeafNodes[0], bigBPlusTreeLeafNodes[1], null],
         isLeafNode: false,
       },
       {
         keys: [15, null],
-        pointers: [
-          bigBPlusTreeLeafNodes[2],
-          bigBPlusTreeLeafNodes[3],
-          null,
-        ],
+        pointers: [bigBPlusTreeLeafNodes[2], bigBPlusTreeLeafNodes[3], null],
         isLeafNode: false,
       },
       null,
-    ]
-  }
+    ],
+  };
 
   //+++ Large B Plus Tree Definition +++//
   const LargeBPlusTree = JSON.parse(JSON.stringify(bigBPlusTree));
@@ -123,7 +115,7 @@ describe('BPlusTree', (): void => {
     {
       isLeafNode: true,
       keys: [13, null],
-      pointers: []
+      pointers: [],
     },
     {
       keys: [15, 43],
@@ -139,7 +131,6 @@ describe('BPlusTree', (): void => {
   LargeBPlusTree.pointers[1].pointers[0] = largeBPlusTreeLeafNodes[2];
   LargeBPlusTree.pointers[1].pointers[1] = largeBPlusTreeLeafNodes[3];
   LargeBPlusTree.pointers[1].pointers[2] = largeBPlusTreeLeafNodes[4];
-
 
   //+++ Huge B Plus Tree Definition +++//
   const hugeBPlusTreeLeafNodes = [
@@ -161,7 +152,7 @@ describe('BPlusTree', (): void => {
     {
       isLeafNode: true,
       keys: [32, 33, null, null],
-      pointers: [null, null, null, null, null]
+      pointers: [null, null, null, null, null],
     },
     {
       keys: [35, 43, 47, null],
@@ -177,7 +168,7 @@ describe('BPlusTree', (): void => {
       keys: [88, 94, 100, null],
       pointers: [null, null, null, null, null],
       isLeafNode: true,
-    }
+    },
   ];
   const HugeBPlusTree = {
     keys: [35, null, null, null],
@@ -204,13 +195,14 @@ describe('BPlusTree', (): void => {
         ],
         isLeafNode: false,
       },
-      null, null, null,
+      null,
+      null,
+      null,
     ],
     isLeafNode: false,
   };
 
   linkLeafNodes(hugeBPlusTreeLeafNodes, 4);
-
 
   //+++ Huge B Plus Tree max keys 5 Definition +++//
   const hugeBPlusTreeLeafNodesM5 = [
@@ -232,7 +224,7 @@ describe('BPlusTree', (): void => {
     {
       isLeafNode: true,
       keys: [28, 32, 33, 35, null],
-      pointers: [null, null, null, null, null, null]
+      pointers: [null, null, null, null, null, null],
     },
     {
       keys: [43, 47, 70, 76, null],
@@ -247,12 +239,13 @@ describe('BPlusTree', (): void => {
   ];
   const HugeBPlusTreeM5 = {
     keys: [6, 13, 28, 43, 84],
-    pointers: [hugeBPlusTreeLeafNodesM5[0],
-    hugeBPlusTreeLeafNodesM5[1],
-    hugeBPlusTreeLeafNodesM5[2],
-    hugeBPlusTreeLeafNodesM5[3],
-    hugeBPlusTreeLeafNodesM5[4],
-    hugeBPlusTreeLeafNodesM5[5],
+    pointers: [
+      hugeBPlusTreeLeafNodesM5[0],
+      hugeBPlusTreeLeafNodesM5[1],
+      hugeBPlusTreeLeafNodesM5[2],
+      hugeBPlusTreeLeafNodesM5[3],
+      hugeBPlusTreeLeafNodesM5[4],
+      hugeBPlusTreeLeafNodesM5[5],
     ],
     isLeafNode: false,
   };
@@ -278,7 +271,7 @@ describe('BPlusTree', (): void => {
     {
       isLeafNode: true,
       keys: [10, 11],
-      pointers: [null, null, null]
+      pointers: [null, null, null],
     },
     {
       keys: [13, null],
@@ -294,17 +287,17 @@ describe('BPlusTree', (): void => {
       keys: [28, 32],
       pointers: [null, null, null],
       isLeafNode: true,
-    }, 
+    },
     {
       keys: [33, null],
       pointers: [null, null, null],
       isLeafNode: true,
-    }, 
+    },
     {
       keys: [35, null],
       pointers: [null, null, null],
       isLeafNode: true,
-    }, 
+    },
     {
       keys: [43, 47],
       pointers: [null, null, null],
@@ -406,14 +399,13 @@ describe('BPlusTree', (): void => {
             ],
             isLeafNode: false,
           },
-          null,        
+          null,
         ],
         isLeafNode: false,
       },
     ],
     isLeafNode: false,
   };
-
 
   //+++ Test Interfaces +++//
   const MaxKeys3TreeLeafNodes = [
@@ -435,7 +427,7 @@ describe('BPlusTree', (): void => {
     {
       isLeafNode: true,
       keys: [15, 43, null],
-      pointers: [null, null, null, null,],
+      pointers: [null, null, null, null],
     },
   ];
   linkLeafNodes(MaxKeys3TreeLeafNodes, 3);
@@ -465,7 +457,7 @@ describe('BPlusTree', (): void => {
 
   //+++ Test Helper Functions +++//
   const runFindTest = (parameters: findTestOptions): findTestReturn => {
-    const { treeRoot, treeDegree, testNumbers, } = parameters;
+    const { treeRoot, treeDegree, testNumbers } = parameters;
     const myFindBPlusTree = BPlusTreeFactory(treeDegree);
     myFindBPlusTree.setRoot(treeRoot);
 
@@ -474,56 +466,107 @@ describe('BPlusTree', (): void => {
       returnValues.push(myFindBPlusTree.find(value));
     }
     return { returnValues, queue: myFindBPlusTree.getAlgoStepQueue() };
-  }
-  const runInsertTest = (parameters: testOptions): insertTestReturn => {
+  };
+  const runInsertTest = (parameters: testOptions): BPlusTree => {
     const { treeDegree, testNumbers } = parameters;
     const myBPlusTree = BPlusTreeFactory(treeDegree);
 
     for (let value of testNumbers) {
       myBPlusTree.insert(value);
     }
-    return { returnValue: myBPlusTree.getRoot(), queue: myBPlusTree.getAlgoStepQueue() };
-  }
+    return myBPlusTree;
+  };
+  //TODO finish implementing delete test
+  const runDeleteTest = (
+    numbersToDelete: number[],
+    testBPlusTree: BPlusTree
+  ): BPlusTree => {
+    for (let value of numbersToDelete) {
+      testBPlusTree.deleteNum(value);
+    }
+    return testBPlusTree;
+  };
 
-  const makeBPlusTreeInsertTestCase = (numbersToInsert: number[],
+  const makeBPlusTreeInsertTestCase = (
+    numbersToInsert: number[],
     maxKeysTestValue: number,
     expectedBPlusTree: any,
     expectedAlgoQueue: algoQueueElement[],
-    logFlag = false) => {
+    logFlag = false
+  ) => {
+    const testBPlusTree = runInsertTest({
+      treeDegree: maxKeysTestValue,
+      testNumbers: numbersToInsert,
+    });
+    const BPlusTreeTestResult = testBPlusTree.getRoot();
+    const BPlusTreeAlgoQueue = testBPlusTree.getAlgoStepQueue();
     describe(`insert b+tree ${numbersToInsert} with maxKeys of ${maxKeysTestValue}`, (): void => {
-      const insertTestReturn = runInsertTest({ treeDegree: maxKeysTestValue, testNumbers: numbersToInsert });
-      const BPlusTreeTestResult = insertTestReturn.returnValue;
-      const BPlusTreeAlgoQueue = insertTestReturn.queue;
-      it('should insert b+tree numbers',
-        (): void => {
-          expect(BPlusTreeTestResult).excludingEvery(objectsToExclude).to.deep.equal(expectedBPlusTree);
-        });
-      xit('should result in correct algo step queue for b+tree',
-        (): void => {
-          expect(BPlusTreeAlgoQueue).to.eql(expectedAlgoQueue);
-        });
+      it("should insert b+tree numbers", (): void => {
+        expect(BPlusTreeTestResult)
+          .excludingEvery(objectsToExclude)
+          .to.deep.equal(expectedBPlusTree);
+      });
+      xit("should result in correct algo step queue for b+tree", (): void => {
+        expect(BPlusTreeAlgoQueue).to.eql(expectedAlgoQueue);
+      });
       if (logFlag) {
-        console.dir(`b plus tree with maxKeys ${maxKeysTestValue} and numbers to insert ${numbersToInsert} result\n`, BPlusTreeTestResult);
+        console.dir(
+          `b plus tree with maxKeys ${maxKeysTestValue} and numbers to insert ${numbersToInsert} result\n`,
+          BPlusTreeTestResult
+        );
         console.dir("expected b plus tree\n", expectedBPlusTree);
       }
     });
-  }
+    return testBPlusTree;
+  };
 
+  const makeBPlusTreeDeleteTestCase = (
+    inputBPlusTree: BPlusTree,
+    expectedBPlusTree: any,
+    expectedAlgoQueue: algoQueueElement[],
+    numbersToDelete: number[],
+    logFlag = false
+  ) => {
+    describe(`numbers to delete ${numbersToDelete}`, (): void => {
+      const DeleteTestReturn = runDeleteTest(numbersToDelete, inputBPlusTree);
+      const TestReturnTreeRoot = DeleteTestReturn.getRoot();
+      const testReturnQueue = DeleteTestReturn.getAlgoStepQueue();
+      it("should delete b+tree numbers", (): void => {
+        expect(TestReturnTreeRoot)
+          .excludingEvery(objectsToExclude)
+          .to.deep.equal(expectedBPlusTree);
+      });
+      xit("should result in correct algo step queue for b+tree", (): void => {
+        expect(testReturnQueue).to.eql(expectedAlgoQueue);
+      });
+      if (logFlag) {
+        console.dir(
+          `result of delete test with numbers ${numbersToDelete}\n`,
+          TestReturnTreeRoot
+        );
+        console.dir("expected b plus tree\n", expectedBPlusTree);
+      }
+    });
+  };
 
   const myBplusTree = BPlusTreeFactory(2);
-  describe('BPlusTreeFactory', () => { // the tests container
-    it('should return BPlusTree object with null root and maxChildren set',
-      (): void => {
-        expect(myBplusTree).to.include({ maxKeys: 2 });
-      });
+  describe("BPlusTreeFactory", () => {
+    // the tests container
+    it("should return BPlusTree object with null root and maxChildren set", (): void => {
+      expect(myBplusTree).to.include({ maxKeys: 2 });
+    });
   });
 
-
-  const objectsToExclude = ['getParentNode', 'setParentNode'];
-  describe('BPlusTree find func', (): void => {
-    describe('test find on small b+tree', (): void => {
-      const smallBTreeTestparameters = { treeRoot: smallBPlusTree, treeDegree: 2, testNumbers: [6, 2, 3, 4, 10] };
-      const { returnValues: actualReturnValues, queue: algoStepQueue } = runFindTest(smallBTreeTestparameters);
+  const objectsToExclude = ["getParentNode", "setParentNode"];
+  describe("BPlusTree find func", (): void => {
+    describe("test find on small b+tree", (): void => {
+      const smallBTreeTestparameters = {
+        treeRoot: smallBPlusTree,
+        treeDegree: 2,
+        testNumbers: [6, 2, 3, 4, 10],
+      };
+      const { returnValues: actualReturnValues, queue: algoStepQueue } =
+        runFindTest(smallBTreeTestparameters);
       const expectedReturnValues = [
         { node: smallBPlusTreeLeafNodes[1], foundFlag: true },
         { node: smallBPlusTreeLeafNodes[0], foundFlag: true },
@@ -531,85 +574,98 @@ describe('BPlusTree', (): void => {
         { node: smallBPlusTreeLeafNodes[1], foundFlag: true },
         { node: smallBPlusTreeLeafNodes[1], foundFlag: false },
       ];
-      const returnAndExpectedValues = zip([actualReturnValues, expectedReturnValues]);
-      it('should successfully find the numbers 6, 2, 3, and 4 and fail to find 10',
-        (): void => {
-          for (let pair of returnAndExpectedValues) {
-            expect(pair[0]).to.eql(pair[1]);
-          }
-        });
-      it('should insert the correct steps into the algo step queue',
-        (): void => {
-          expect(algoStepQueue).to.eql(
-            [
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
-              { type: algoStepTypeEnum.NotFound }
-            ]
-          );
-        });
-      console.debug("algo step queue of small b tree find test\n", algoStepQueue);
+      const returnAndExpectedValues = zip([
+        actualReturnValues,
+        expectedReturnValues,
+      ]);
+      it("should successfully find the numbers 6, 2, 3, and 4 and fail to find 10", (): void => {
+        for (let pair of returnAndExpectedValues) {
+          expect(pair[0]).to.eql(pair[1]);
+        }
+      });
+      it("should insert the correct steps into the algo step queue", (): void => {
+        expect(algoStepQueue).to.eql([
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+          { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
+          { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
+          { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+          { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+          { type: algoStepTypeEnum.NotFound },
+        ]);
+      });
+      console.debug(
+        "algo step queue of small b tree find test\n",
+        algoStepQueue
+      );
     });
 
-    describe('test find on big b+tree', (): void => {
-      const bigBPlusTreeParameters = { treeRoot: bigBPlusTree, treeDegree: 2, testNumbers: [6, 10, 5] };
-      const { returnValues: actualValues, queue: algoStepQueue } = runFindTest(bigBPlusTreeParameters);
+    describe("test find on big b+tree", (): void => {
+      const bigBPlusTreeParameters = {
+        treeRoot: bigBPlusTree,
+        treeDegree: 2,
+        testNumbers: [6, 10, 5],
+      };
+      const { returnValues: actualValues, queue: algoStepQueue } = runFindTest(
+        bigBPlusTreeParameters
+      );
       const expectedReturnValues = [
         { node: bigBPlusTreeLeafNodes[1], foundFlag: true },
         { node: bigBPlusTreeLeafNodes[2], foundFlag: true },
         { node: bigBPlusTreeLeafNodes[1], foundFlag: false },
       ];
       const returnAndExpectedValues = zip([actualValues, expectedReturnValues]);
-      it('should successfully find the 6, and 10, and fail to find 5',
-        (): void => {
-          for (let value of returnAndExpectedValues) {
-            expect(value[0]).to.eql(value[1]);
-          }
-        });
-      it('should insert the correct steps into the algo step queue',
-        (): void => {
-          expect(algoStepQueue).to.eql(
-            [
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
-              { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
-              { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
-              { type: algoStepTypeEnum.NotFound }
-            ]
-          );
-        });
+      it("should successfully find the 6, and 10, and fail to find 5", (): void => {
+        for (let value of returnAndExpectedValues) {
+          expect(value[0]).to.eql(value[1]);
+        }
+      });
+      it("should insert the correct steps into the algo step queue", (): void => {
+        expect(algoStepQueue).to.eql([
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+          { type: algoStepTypeEnum.Found, foundElementIndex: 1 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
+          { type: algoStepTypeEnum.Found, foundElementIndex: 0 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 0 },
+          { type: algoStepTypeEnum.SelectChild, selectedChildIndex: 1 },
+          { type: algoStepTypeEnum.NotFound },
+        ]);
+      });
     });
   });
 
-  describe('BPlusTree insert func', (): void => {
-    let { returnValue, queue } = runInsertTest({ treeDegree: 2, testNumbers: [2] });
-    describe('insert initial root', (): void => {
-      it('should initialize the root when first number is inserted',
-        (): void => {
-          expect(returnValue).to.not.be.a('null');
-          expect(returnValue).to.have.property('isLeafNode').eql(true);
-          expect(returnValue).to.have.property('keys').eql([2, null]);
-          expect(returnValue).to.have.property('pointers').eql([null, null, null]);
-          expect(queue).to.eql([
-            { type: algoStepTypeEnum.InitRoot },
-            { type: algoStepTypeEnum.InsertInLeaf },
-          ]);
-        });
+  let smallBPlusTreeTestReturn: BPlusTree | null = null;
+  describe("BPlusTree insert func", (): void => {
+    let testBPlusTree = runInsertTest({ treeDegree: 2, testNumbers: [2] });
+    let returnValue = testBPlusTree.getRoot();
+    let queue = testBPlusTree.getAlgoStepQueue();
+    describe("insert initial root", (): void => {
+      it("should initialize the root when first number is inserted", (): void => {
+        expect(returnValue).to.not.be.a("null");
+        expect(returnValue).to.have.property("isLeafNode").eql(true);
+        expect(returnValue).to.have.property("keys").eql([2, null]);
+        expect(returnValue)
+          .to.have.property("pointers")
+          .eql([null, null, null]);
+        expect(queue).to.eql([
+          { type: algoStepTypeEnum.InitRoot },
+          { type: algoStepTypeEnum.InsertInLeaf },
+        ]);
+      });
     });
 
     let numbersToInsert = [2, 3, 4, 6];
-    makeBPlusTreeInsertTestCase(numbersToInsert, 2, smallBPlusTree, []);
+    smallBPlusTreeTestReturn = makeBPlusTreeInsertTestCase(
+      numbersToInsert,
+      2,
+      smallBPlusTree,
+      []
+    );
 
     numbersToInsert = [2, 3, 4, 6, 15, 10, 11];
     makeBPlusTreeInsertTestCase(numbersToInsert, 2, bigBPlusTree, []);
@@ -619,13 +675,40 @@ describe('BPlusTree', (): void => {
 
     makeBPlusTreeInsertTestCase(numbersToInsert, 3, MaxKeys3Tree, []);
 
-    numbersToInsert.push(70, 28, 84, 6, 35, 88, 100, 22, 76, 47, 32, 94, 5, 33, 70);
+    numbersToInsert.push(
+      70,
+      28,
+      84,
+      6,
+      35,
+      88,
+      100,
+      22,
+      76,
+      47,
+      32,
+      94,
+      5,
+      33,
+      70
+    );
     //2,3,4,6,15,10,11,43,13,70,28,84,6,35,88,100,22,76,47,32,94,5,33,70
     makeBPlusTreeInsertTestCase(numbersToInsert, 4, HugeBPlusTree, []);
 
     makeBPlusTreeInsertTestCase(numbersToInsert, 5, HugeBPlusTreeM5, []);
 
     //TODO Check if this test case is correct
-    makeBPlusTreeInsertTestCase(numbersToInsert, 2, HugeBPlusTreeM2, [], true);
+    makeBPlusTreeInsertTestCase(numbersToInsert, 2, HugeBPlusTreeM2, []);
+  });
+  describe("BPlusTree delete func", (): void => {
+    if (smallBPlusTreeTestReturn) {
+      makeBPlusTreeDeleteTestCase(
+        smallBPlusTreeTestReturn,
+        smallBPlusTree,
+        [],
+        [3],
+        true
+      );
+    }
   });
 });

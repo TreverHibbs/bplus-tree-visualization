@@ -45,6 +45,7 @@ export interface BPlusTree {
   setRoot: (newRoot: BPlusTreeRoot) => void;
   maxKeys: number;
   insert: (a: number) => void;
+  deleteNum: (num: number) => boolean;
   find: (v: number) => findReturnType;
 }
 
@@ -347,12 +348,23 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
     }
   }
 
+  /**
+   * deletes a number in a BPlusTree
+   * @param {number} value - The number to delete
+   * @return {boolean} deletedFlag - Wether or not number was deleted
+   * true if number was deleted false if it was not found.
+   */
+  const deleteNum = (numToDelete: number) => {
+    return false;
+  }
+
   const newBPlusTree = {
     getAlgoStepQueue,
     getRoot,
     setRoot,
     maxKeys,
     insert,
+    deleteNum,
     find
   };
 
