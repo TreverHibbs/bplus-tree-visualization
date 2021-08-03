@@ -50,6 +50,19 @@ describe("BPlusTree", (): void => {
     keys: [4, null],
     pointers: smallBPlusTreeLeafNodes,
   };
+  //+++ Small B Plus Tree with 3 deleted Definition +++//
+  const smallBPlusTreeLeafNodesD3 = [
+    { isLeafNode: true, keys: [2, null], pointers: [] },
+    { isLeafNode: true, keys: [4, 6], pointers: [] },
+    null,
+  ];
+  linkLeafNodes(smallBPlusTreeLeafNodesD3, 2);
+
+  const smallBPlusTreeD3 = {
+    isLeafNode: false,
+    keys: [4, null],
+    pointers: smallBPlusTreeLeafNodesD3,
+  };
 
   //+++ Big B Plus Tree Definition +++//
   const bigBPlusTreeLeafNodes = [
@@ -476,7 +489,6 @@ describe("BPlusTree", (): void => {
     }
     return myBPlusTree;
   };
-  //TODO finish implementing delete test
   const runDeleteTest = (
     numbersToDelete: number[],
     testBPlusTree: BPlusTree
@@ -597,10 +609,10 @@ describe("BPlusTree", (): void => {
           { type: algoStepTypeEnum.NotFound },
         ]);
       });
-      console.debug(
-        "algo step queue of small b tree find test\n",
-        algoStepQueue
-      );
+      //console.debug(
+      //  "algo step queue of small b tree find test\n",
+      //  algoStepQueue
+      //);
     });
 
     describe("test find on big b+tree", (): void => {
@@ -697,14 +709,13 @@ describe("BPlusTree", (): void => {
 
     makeBPlusTreeInsertTestCase(numbersToInsert, 5, HugeBPlusTreeM5, []);
 
-    //TODO Check if this test case is correct
     makeBPlusTreeInsertTestCase(numbersToInsert, 2, HugeBPlusTreeM2, []);
   });
   describe("BPlusTree delete func", (): void => {
     if (smallBPlusTreeTestReturn) {
       makeBPlusTreeDeleteTestCase(
         smallBPlusTreeTestReturn,
-        smallBPlusTree,
+        smallBPlusTreeD3,
         [],
         [3],
         true
