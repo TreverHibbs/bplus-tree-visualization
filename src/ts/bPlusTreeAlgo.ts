@@ -420,15 +420,64 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
         node.pointers.filter((pointer) => pointer != null).length <
           Math.ceil((maxKeys + 1) / 2))
     ) {
+      // this if block handles the case where N has too few values/pointers.
       const parent = node.getParentNode();
       //TODO finish this bit
       if (parent) {
-        const nodeIndex = parent.pointers.indexOf(node);
+        let nodeIndex = parent.pointers.indexOf(node);
+        let borrowNodeIndex = 0;
         let borrowNode: BPlusTreeNode | null = null;
         if (nodeIndex - 1 >= 0 && parent.pointers[nodeIndex - 1] != null) {
+          borrowNodeIndex = nodeIndex - 1;
           borrowNode = parent.pointers[nodeIndex - 1];
         } else {
+          borrowNodeIndex = nodeIndex + 1;
           borrowNode = parent.pointers[nodeIndex + 1];
+        }
+
+        // borrow value is the value between pointers node and borrowNode in parent(node)
+        let borrowValue = 0;
+        if (borrowNodeIndex < nodeIndex && parent.keys[borrowNodeIndex]) {
+          borrowValue = parent.keys[borrowNodeIndex]!;
+        } else if (parent.keys[nodeIndex]) {
+          borrowValue = parent.keys[nodeIndex]!;
+        } else {
+          console.error("parent.keys[index] was null");
+        }
+
+        // handle case where entries in node and borrow node can fit in a single node.
+        if (
+          borrowNode &&
+          node.keys.filter((value) => value != null).length +
+            borrowNode.keys.filter((value) => value != null).length <=
+            maxKeys
+        ) {
+          // block coalesces two nodes
+          //TODO finish this block
+          if (nodeIndex < borrowNodeIndex) {
+            const tmp = borrowNode;
+            borrowNode = node;
+            node = tmp;
+          }
+          if (!node.isLeafNode) {
+            fixedInsert(
+              borrowNode.keys,
+              borrowValue,
+              borrowNode.keys.findIndex((element) => element == null)
+            );
+            const startIndex = node.keys.findIndex(
+              (element) => element == null
+            );
+            if (borrowNode) {
+              node.keys
+                .filter((value) => value != null)
+                .forEach((value, index) =>
+                  fixedInsert(borrowNode!.keys, value, startIndex + index)
+                );
+            }else{
+              console.error("borrow node null");
+            }
+          }
         }
       }
     }

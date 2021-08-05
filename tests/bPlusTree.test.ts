@@ -38,6 +38,9 @@ type BPlusTreeTestRoot = BPlusTreeTestNode | null;
 
 describe("BPlusTree", (): void => {
   //+++ Small B Plus Tree Definition +++//
+  //TODO refactor this test code
+  const smallBPlusTreeNumbers = [2, 3, 4, 6];
+
   const smallBPlusTreeLeafNodes = [
     { isLeafNode: true, keys: [2, 3], pointers: [] },
     { isLeafNode: true, keys: [4, 6], pointers: [] },
@@ -62,6 +65,19 @@ describe("BPlusTree", (): void => {
     isLeafNode: false,
     keys: [4, null],
     pointers: smallBPlusTreeLeafNodesD3,
+  };
+  //+++ Small B Plus Tree with 3, 2 deleted Definition +++//
+  const smallBPlusTreeLeafNodesD3and2 = [
+    { isLeafNode: true, keys: [4, null], pointers: [] },
+    { isLeafNode: true, keys: [6, null], pointers: [] },
+    null,
+  ];
+  linkLeafNodes(smallBPlusTreeLeafNodesD3and2, 2);
+
+  const smallBPlusTreeD3and2 = {
+    isLeafNode: false,
+    keys: [6, null],
+    pointers: smallBPlusTreeLeafNodesD3and2,
   };
 
   //+++ Big B Plus Tree Definition +++//
@@ -522,11 +538,12 @@ describe("BPlusTree", (): void => {
         expect(BPlusTreeAlgoQueue).to.eql(expectedAlgoQueue);
       });
       if (logFlag) {
-        console.dir(
-          `b plus tree with maxKeys ${maxKeysTestValue} and numbers to insert ${numbersToInsert} result\n`,
-          BPlusTreeTestResult
+        console.info(
+          `b plus tree with maxKeys ${maxKeysTestValue} and numbers to insert ${numbersToInsert} result\n`
         );
-        console.dir("expected b plus tree\n", expectedBPlusTree);
+        console.dir(BPlusTreeTestResult);
+        console.info(`expected b plus tree\n`);
+        console.dir(expectedBPlusTree);
       }
     });
     return testBPlusTree;
@@ -651,7 +668,6 @@ describe("BPlusTree", (): void => {
     });
   });
 
-  let smallBPlusTreeTestReturn: BPlusTree | null = null;
   describe("BPlusTree insert func", (): void => {
     let testBPlusTree = runInsertTest({ treeDegree: 2, testNumbers: [2] });
     let returnValue = testBPlusTree.getRoot();
@@ -671,13 +687,9 @@ describe("BPlusTree", (): void => {
       });
     });
 
+    //+++ inserte tests +++//
     let numbersToInsert = [2, 3, 4, 6];
-    smallBPlusTreeTestReturn = makeBPlusTreeInsertTestCase(
-      numbersToInsert,
-      2,
-      smallBPlusTree,
-      []
-    );
+    makeBPlusTreeInsertTestCase(numbersToInsert, 2, smallBPlusTree, [], false);
 
     numbersToInsert = [2, 3, 4, 6, 15, 10, 11];
     makeBPlusTreeInsertTestCase(numbersToInsert, 2, bigBPlusTree, []);
@@ -712,14 +724,19 @@ describe("BPlusTree", (): void => {
     makeBPlusTreeInsertTestCase(numbersToInsert, 2, HugeBPlusTreeM2, []);
   });
   describe("BPlusTree delete func", (): void => {
-    if (smallBPlusTreeTestReturn) {
-      makeBPlusTreeDeleteTestCase(
-        smallBPlusTreeTestReturn,
-        smallBPlusTreeD3,
-        [],
-        [3],
-        true
-      );
-    }
+    makeBPlusTreeDeleteTestCase(
+      runInsertTest({ treeDegree: 2, testNumbers: smallBPlusTreeNumbers }),
+      smallBPlusTreeD3,
+      [],
+      [3],
+      false
+    );
+    makeBPlusTreeDeleteTestCase(
+      runInsertTest({ treeDegree: 2, testNumbers: smallBPlusTreeNumbers }),
+      smallBPlusTreeD3and2,
+      [],
+      [3, 2],
+      true
+    );
   });
 });
