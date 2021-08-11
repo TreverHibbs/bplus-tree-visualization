@@ -421,26 +421,26 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
           Math.ceil((maxKeys + 1) / 2))
     ) {
       // this if block handles the case where N has too few values/pointers.
-      const parent = node.getParentNode();
+      const parentNode = node.getParentNode();
       //TODO finish this bit
-      if (parent) {
-        let nodeIndex = parent.pointers.indexOf(node);
+      if (parentNode) {
+        let nodeIndex = parentNode.pointers.indexOf(node);
         let borrowNodeIndex = 0;
         let borrowNode: BPlusTreeNode | null = null;
-        if (nodeIndex - 1 >= 0 && parent.pointers[nodeIndex - 1] != null) {
+        if (nodeIndex - 1 >= 0 && parentNode.pointers[nodeIndex - 1] != null) {
           borrowNodeIndex = nodeIndex - 1;
-          borrowNode = parent.pointers[nodeIndex - 1];
+          borrowNode = parentNode.pointers[nodeIndex - 1];
         } else {
           borrowNodeIndex = nodeIndex + 1;
-          borrowNode = parent.pointers[nodeIndex + 1];
+          borrowNode = parentNode.pointers[nodeIndex + 1];
         }
 
         // borrow value is the value between pointers node and borrowNode in parent(node)
         let borrowValue = 0;
-        if (borrowNodeIndex < nodeIndex && parent.keys[borrowNodeIndex]) {
-          borrowValue = parent.keys[borrowNodeIndex]!;
-        } else if (parent.keys[nodeIndex]) {
-          borrowValue = parent.keys[nodeIndex]!;
+        if (borrowNodeIndex < nodeIndex && parentNode.keys[borrowNodeIndex]) {
+          borrowValue = parentNode.keys[borrowNodeIndex]!;
+        } else if (parentNode.keys[nodeIndex]) {
+          borrowValue = parentNode.keys[nodeIndex]!;
         } else {
           console.error("parent.keys[index] was null");
         }
@@ -465,19 +465,15 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
               borrowValue,
               borrowNode.keys.findIndex((element) => element == null)
             );
-            const startIndex = node.keys.findIndex(
-              (element) => element == null
-            );
-            if (borrowNode) {
-              node.keys
-                .filter((value) => value != null)
-                .forEach((value, index) =>
-                  fixedInsert(borrowNode!.keys, value, startIndex + index)
-                );
-            }else{
-              console.error("borrow node null");
-            }
+            appendAllPointersValues(node, borrowNode);
+          } else {
+            appendAllPointersValues(node, borrowNode);
+            borrowNode.pointers[-1] = node.pointers[-1];
           }
+          //delete_entry(parent(N), K', N); delete node N
+          parentNode.keys[parentNode.keys.findIndex(value => value == borrowValue)] = null;
+          parentNode.pointers[nodeIndex] = null;
+        } else {// redistribution: borrow an entry from N'
         }
       }
     }
@@ -507,3 +503,22 @@ export function makeFixedArray<ElementType>(
   Object.seal(arrCopy);
   return arrCopy;
 }
+
+/* append all pointers and values of one node to another*/
+export const appendAllPointersValues = (
+  node: BPlusTreeNode,
+  nodePrime: BPlusTreeNode
+) => {
+  let startIndex = node.keys.findIndex((element) => element == null);
+  node.keys
+    .filter((value) => value != null)
+    .forEach((value, index) =>
+      fixedInsert(nodePrime!.keys, value, startIndex + index)
+    );
+  startIndex = node.pointers.findIndex((element) => element == null);
+  node.pointers
+    .filter((value) => value != null)
+    .forEach((value, index) =>
+      fixedInsert(nodePrime!.pointers, value, startIndex + index)
+    );
+};

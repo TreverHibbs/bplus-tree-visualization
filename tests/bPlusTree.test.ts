@@ -5,6 +5,8 @@ import {
   algoQueueElement,
   findReturnType,
   BPlusTree,
+  appendAllPointersValues,
+  BPlusTreeNode,
 } from "../src/ts/bPlusTreeAlgo";
 import { expect } from "chai";
 import * as chai from "chai";
@@ -738,5 +740,27 @@ describe("BPlusTree", (): void => {
       [3, 2],
       true
     );
+  });
+  describe("BPlusTree helper func", (): void => {
+    describe("append two nodes", (): void => {
+      it("should append all key value pairs of first node to second node", (): void => {
+        const node = {
+          isLeafNode: true,
+          keys: [2, 3, null, null],
+          pointers: [1, 2, null, null],
+        };
+        const nodePrime = {
+          isLeafNode: true,
+          keys: [4, 6, null, null],
+          pointers: [1, 2, null, null],
+        };
+        appendAllPointersValues(
+          node as any as BPlusTreeNode,
+          nodePrime as any as BPlusTreeNode
+        );
+        expect(nodePrime.keys).to.deep.equal([4, 6, 2, 3]);
+        expect(nodePrime.pointers).to.deep.equal([1, 2, 1, 2]);
+      });
+    });
   });
 });
