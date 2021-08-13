@@ -571,11 +571,10 @@ describe("BPlusTree", (): void => {
         expect(testReturnQueue).to.eql(expectedAlgoQueue);
       });
       if (logFlag) {
-        console.dir(
-          `result of delete test with numbers ${numbersToDelete}\n`,
-          TestReturnTreeRoot
-        );
-        console.dir("expected b plus tree\n", expectedBPlusTree);
+        console.log(`result of delete test with numbers ${numbersToDelete}\n`);
+        console.dir(TestReturnTreeRoot);
+        console.log("expected b plus tree\n");
+        console.dir(expectedBPlusTree);
       }
     });
   };

@@ -402,6 +402,7 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       (element) => element == numToDelete
     );
     node.keys[numToDeleteIndex] = null;
+    node.pointers[numToDeleteIndex+1] = null;
     // Base case node is root and has only one child.
     if (
       node.getParentNode() == null &&
@@ -468,12 +469,16 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
             appendAllPointersValues(node, borrowNode);
           } else {
             appendAllPointersValues(node, borrowNode);
-            borrowNode.pointers[-1] = node.pointers[-1];
+            borrowNode.pointers[maxKeys] = node.pointers[maxKeys];
           }
           //delete_entry(parent(N), K', N); delete node N
-          parentNode.keys[parentNode.keys.findIndex(value => value == borrowValue)] = null;
-          parentNode.pointers[nodeIndex] = null;
-        } else {// redistribution: borrow an entry from N'
+          if(node.getParentNode() != null){
+            deleteNumEntry(borrowValue, node.getParentNode() as BPlusTreeNode);
+          }else{
+            console.error("node parent was null");
+          }
+        } else {
+          // redistribution: borrow an entry from N'
         }
       }
     }
@@ -509,13 +514,13 @@ export const appendAllPointersValues = (
   node: BPlusTreeNode,
   nodePrime: BPlusTreeNode
 ) => {
-  let startIndex = node.keys.findIndex((element) => element == null);
+  let startIndex = nodePrime.keys.findIndex((element) => element == null);
   node.keys
     .filter((value) => value != null)
     .forEach((value, index) =>
       fixedInsert(nodePrime!.keys, value, startIndex + index)
     );
-  startIndex = node.pointers.findIndex((element) => element == null);
+  startIndex = nodePrime.pointers.findIndex((element) => element == null);
   node.pointers
     .filter((value) => value != null)
     .forEach((value, index) =>
