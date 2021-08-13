@@ -402,7 +402,9 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
       (element) => element == numToDelete
     );
     node.keys[numToDeleteIndex] = null;
-    node.pointers[numToDeleteIndex+1] = null;
+    if (!node.isLeafNode) {
+      node.pointers[numToDeleteIndex + 1] = null;
+    }
     // Base case node is root and has only one child.
     if (
       node.getParentNode() == null &&
@@ -472,9 +474,9 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
             borrowNode.pointers[maxKeys] = node.pointers[maxKeys];
           }
           //delete_entry(parent(N), K', N); delete node N
-          if(node.getParentNode() != null){
+          if (node.getParentNode() != null) {
             deleteNumEntry(borrowValue, node.getParentNode() as BPlusTreeNode);
-          }else{
+          } else {
             console.error("node parent was null");
           }
         } else {

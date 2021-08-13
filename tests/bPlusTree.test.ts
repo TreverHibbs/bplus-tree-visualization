@@ -69,17 +69,10 @@ describe("BPlusTree", (): void => {
     pointers: smallBPlusTreeLeafNodesD3,
   };
   //+++ Small B Plus Tree with 3, 2 deleted Definition +++//
-  const smallBPlusTreeLeafNodesD3and2 = [
-    { isLeafNode: true, keys: [4, null], pointers: [] },
-    { isLeafNode: true, keys: [6, null], pointers: [] },
-    null,
-  ];
-  linkLeafNodes(smallBPlusTreeLeafNodesD3and2, 2);
-
   const smallBPlusTreeD3and2 = {
     isLeafNode: false,
-    keys: [6, null],
-    pointers: smallBPlusTreeLeafNodesD3and2,
+    keys: [4, 16],
+    pointers: [null, null, null],
   };
 
   //+++ Big B Plus Tree Definition +++//
