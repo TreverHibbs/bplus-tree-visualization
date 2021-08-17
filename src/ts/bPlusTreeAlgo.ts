@@ -476,9 +476,39 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
           } else {
             console.error("node parent was null");
           }
-          //TODO make test case for this next block
         } else {
           // redistribution: borrow an entry from N'
+          if (borrowNodeIndex < nodeIndex && borrowNode) {
+            if (!node.isLeafNode) {
+              const lastValueInBorrowNode = borrowNode.keys[maxKeys - 1];
+              const lastPointerInBorrowNode = borrowNode.pointers[maxKeys];
+              borrowNode.keys[maxKeys - 1] = null;
+              borrowNode.pointers[maxKeys] = null;
+
+              fixedInsert(node.pointers, lastPointerInBorrowNode, 0);
+              fixedInsert(node.keys, borrowValue, 0);
+
+              parentNode.keys[
+                parentNode.keys.findIndex((value) => value == borrowValue)
+              ] = lastValueInBorrowNode;
+            }else{
+              const lastValueInBorrowNode = borrowNode.keys[maxKeys - 1];
+              const secondTolastPointerInBorrowNode = borrowNode.pointers[maxKeys-1];
+              borrowNode.keys[maxKeys - 1] = null;
+              borrowNode.pointers[maxKeys] = null;
+
+              fixedInsert(node.pointers, secondTolastPointerInBorrowNode, 0);
+              fixedInsert(node.keys, lastValueInBorrowNode, 0);
+
+              parentNode.keys[
+                parentNode.keys.findIndex((value) => value == borrowValue)
+              ] = lastValueInBorrowNode;
+            }
+            //TODO implement this else case
+          } else if(borrowNode) {// symmetric to the then case
+          }else{
+            console.error("borrowNode null");
+          }
         }
       }
     }

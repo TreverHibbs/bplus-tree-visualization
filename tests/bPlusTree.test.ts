@@ -76,6 +76,7 @@ describe("BPlusTree", (): void => {
   };
 
   //+++ Big B Plus Tree Definition +++//
+  const bigBPlusTreeNumbers = [2, 3, 4, 6, 10, 11, 15];
   const bigBPlusTreeLeafNodes = [
     {
       keys: [2, 3],
@@ -112,6 +113,40 @@ describe("BPlusTree", (): void => {
       {
         keys: [15, null],
         pointers: [bigBPlusTreeLeafNodes[2], bigBPlusTreeLeafNodes[3], null],
+        isLeafNode: false,
+      },
+      null,
+    ],
+  };
+  //+++ Big B Plus Tree With 15, 4, and 6 deleted Definition +++//
+  const bigBPlusTreeD3a15a2LeafNodes = [
+    { keys: [2, null], pointers: [null, null, null], isLeafNode: true },
+    { keys: [3, null], pointers: [null, null, null], isLeafNode: true },
+    { keys: [10, null], pointers: [null, null, null], isLeafNode: true },
+    { keys: [11, null], pointers: [null, null, null], isLeafNode: true },
+  ];
+  linkLeafNodes(bigBPlusTreeD3a15a2LeafNodes, 2);
+
+  const bigBPlusTreeD3a15a2 = {
+    isLeafNode: false,
+    keys: [10, null],
+    pointers: [
+      {
+        keys: [3, null],
+        pointers: [
+          bigBPlusTreeD3a15a2LeafNodes[0],
+          bigBPlusTreeD3a15a2LeafNodes[1],
+          null,
+        ],
+        isLeafNode: false,
+      },
+      {
+        keys: [11, null],
+        pointers: [
+          bigBPlusTreeD3a15a2LeafNodes[2],
+          bigBPlusTreeD3a15a2LeafNodes[3],
+          null,
+        ],
         isLeafNode: false,
       },
       null,
@@ -730,6 +765,13 @@ describe("BPlusTree", (): void => {
       smallBPlusTreeD3and2,
       [],
       [3, 2],
+      false
+    );
+    makeBPlusTreeDeleteTestCase(
+      runInsertTest({ treeDegree: 2, testNumbers: bigBPlusTreeNumbers }),
+      bigBPlusTreeD3a15a2,
+      [],
+      [15, 4, 6],
       true
     );
   });
