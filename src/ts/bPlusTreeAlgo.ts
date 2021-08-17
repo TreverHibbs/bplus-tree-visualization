@@ -396,7 +396,6 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
     return false;
   };
 
-  //TODO implement most basic case of this function
   const deleteNumEntry = (numToDelete: number, node: BPlusTreeNode): void => {
     const numToDeleteIndex = node.keys.findIndex(
       (element) => element == numToDelete
@@ -425,7 +424,6 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
     ) {
       // this if block handles the case where N has too few values/pointers.
       const parentNode = node.getParentNode();
-      //TODO finish this bit
       if (parentNode) {
         let nodeIndex = parentNode.pointers.indexOf(node);
         let borrowNodeIndex = 0;
@@ -456,7 +454,6 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
             maxKeys
         ) {
           // block coalesces two nodes
-          //TODO finish this block
           if (nodeIndex < borrowNodeIndex) {
             const tmp = borrowNode;
             borrowNode = node;
@@ -479,6 +476,7 @@ export const BPlusTreeFactory = (maxKeysValue: number): BPlusTree => {
           } else {
             console.error("node parent was null");
           }
+          //TODO make test case for this next block
         } else {
           // redistribution: borrow an entry from N'
         }

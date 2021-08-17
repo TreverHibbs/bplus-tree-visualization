@@ -70,8 +70,8 @@ describe("BPlusTree", (): void => {
   };
   //+++ Small B Plus Tree with 3, 2 deleted Definition +++//
   const smallBPlusTreeD3and2 = {
-    isLeafNode: false,
-    keys: [4, 16],
+    isLeafNode: true,
+    keys: [4, 6],
     pointers: [null, null, null],
   };
 
